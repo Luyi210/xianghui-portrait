@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高校项目多校比较</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+  <link rel="stylesheet" href="assets/css/benchmark.css" />
+</head>
+<body>
+<div class="page">
+  <div class="brand-banner">
+    <div class="brand-hero">
+      <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+      <div class="brand-title">多校项目比较</div>
+      <div class="brand-copy">对比多个高校项目在导师制、科研训练、国际交流、资助、选拔机制与学科覆盖上的特征差异。本轮已尽量替换为具体项目页、honors 详情页、本科科研门户页。</div>
+    </div>
+    <div class="brand-nav">
+      <div class="brand-kicker">BENCHMARK COMPARE</div>
+      <div class="brand-copy">支持 query 参数 <code>?ids=fudan-xh,tsinghua-xuetang,pku-yuanpei</code>；若未传参数，则使用默认样本。</div>
+      <div class="brand-link-row">
+        <a class="brand-link" href="benchmark_overview.html">对标总览</a>
+        <a class="brand-link" href="data_methodology.html">数据方法</a>
+        <a class="brand-link" href="index_formal.html">回到画像首页</a>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="topbar">
+    <div>
+      <h1>多校比较面板</h1>
+      <p>比较页增加了更明确的“项目页面入口”结构，并把整体外观调整成绛红—纸张色的复旦专题风格，减弱通用深蓝驾驶舱感。</p>
+    </div>
+    <div class="nav-row">
+      <select id="presetSelect" class="select"></select>
+      <button class="btn" onclick="applyPreset()">切换样本</button>
+    </div>
+  </div>
+
+  <div class="section-index">
+    <a class="index-pill" href="#compareTablePanel">比较表</a>
+    <a class="index-pill" href="#chartPanel">比较图</a>
+    <a class="index-pill" href="phase3_progress.md" target="_blank">阶段记录</a>
+  </div>
+
+  <div class="grid-main" id="chartPanel">
+    <div>
+      <div class="panel">
+        <div class="panel-title"><h3>条形比较图</h3><div class="desc">当前展示科研训练维度，可直观看强弱差异。</div></div>
+        <div id="barChart" class="chart-box"></div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-title"><h3>六维雷达对比</h3><div class="desc">适合看整体培养机制轮廓。</div></div>
+        <div id="radarChart" class="chart-box"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-title"><h3>维度解释</h3><div class="desc">页面中的数值是结构化展示分，不是官方量化评分。</div></div>
+        <div class="bar-list">
+          <div class="note-card"><div class="title">导师制</div><div class="text">重点看是否有稳定导师、导学共同体与持续支持，而不是仅有名义上的导师安排。</div></div>
+          <div class="note-card"><div class="title">科研训练</div><div class="text">重点看本科生是否能较早接触科研项目、实验室与真实学术训练。</div></div>
+          <div class="note-card"><div class="title">国际交流 / 资助 / 选拔 / 学科覆盖</div><div class="text">这些维度共同帮助判断一个项目是更偏“高强度学术路径”，还是更偏“宽口径探索路径”。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="compareTablePanel" style="margin-top:16px;">
+    <div class="panel-title"><h3>比较表</h3><div class="desc">最少覆盖：导师制、科研训练、国际交流、资助、选拔机制、学科覆盖，并提供直达项目页入口</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>学校/项目</th>
+            <th>导师制</th>
+            <th>科研训练</th>
+            <th>国际交流</th>
+            <th>资助支持</th>
+            <th>选拔机制</th>
+            <th>学科覆盖</th>
+            <th>项目页面</th>
+            <th>详情</th>
+          </tr>
+        </thead>
+        <tbody id="compareTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="assets/js/benchmark_data.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const defaultIds = ['fudan-xh', 'tsinghua-xuetang', 'pku-yuanpei'];
+const ids = (params.get('ids') || defaultIds.join(',')).split(',').filter(Boolean);
+const presets = {
+  '复旦-清华-北大': ['fudan-xh','tsinghua-xuetang','pku-yuanpei'],
+  '复旦-哈佛-耶鲁': ['fudan-xh','harvard-college','yale-directed'],
+  '复旦-上交-芝加哥': ['fudan-xh','sjtu-zhiyuan','uchicago-college']
+};
+const presetSelect = document.getElementById('presetSelect');
+presetSelect.innerHTML = Object.keys(presets).map(k => `<option value="${k}">${k}</option>`).join('');
+
+function getRows(selectedIds) { return selectedIds.map(id => getBenchmarkById(id)).filter(Boolean); }
+function render(selectedIds) {
+  const rows = getRows(selectedIds);
+  document.getElementById('compareTable').innerHTML = rows.map(item => `
+    <tr>
+      <td>${item.schoolName}<br><span class="desc">${item.programName}</span></td>
+      <td>${item.mentorSystem}</td>
+      <td>${item.researchTraining}</td>
+      <td>${item.internationalExchange}</td>
+      <td>${item.fundingSupport}</td>
+      <td>${item.selectionScore}</td>
+      <td>${item.disciplineCoverage}</td>
+      <td><a class="btn" href="${item.projectUrl || item.officialUrl}" target="_blank" rel="noopener noreferrer">项目页</a></td>
+      <td><a class="btn" href="benchmark_detail.html?id=${item.id}">详情</a></td>
+    </tr>
+  `).join('');
+
+  barChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 40, right: 20, top: 30, bottom: 40 },
+    xAxis: { type: 'category', data: rows.map(r => r.schoolName), axisLabel: { color: '#6b5d52' }, axisLine: { lineStyle: { color: 'rgba(122,31,53,0.18)' } } },
+    yAxis: { type: 'value', axisLabel: { color: '#6b5d52' }, splitLine: { lineStyle: { color: 'rgba(122,31,53,.08)' } } },
+    series: [{ type: 'bar', data: rows.map(r => r.researchTraining), itemStyle: { color: '#c79a62', borderRadius: [8,8,0,0] } }]
+  });
+
+  radarChart.setOption({
+    legend: { data: rows.map(r => r.compareLabel), textStyle: { color: '#5f4a3f' } },
+    radar: {
+      indicator: [
+        { name: '导师制', max: 100 }, { name: '科研训练', max: 100 }, { name: '国际交流', max: 100 },
+        { name: '资助支持', max: 100 }, { name: '选拔机制', max: 100 }, { name: '学科覆盖', max: 100 }
+      ],
+      axisName: { color: '#6b5d52' },
+      splitLine: { lineStyle: { color: 'rgba(122,31,53,.10)' } },
+      splitArea: { areaStyle: { color: ['rgba(122,31,53,.025)','rgba(215,176,122,.05)'] } },
+      axisLine: { lineStyle: { color: 'rgba(122,31,53,.14)' } }
+    },
+    series: [{
+      type: 'radar',
+      data: rows.map((r, idx) => ({
+        value: [r.mentorSystem, r.researchTraining, r.internationalExchange, r.fundingSupport, r.selectionScore, r.disciplineCoverage],
+        name: r.compareLabel,
+        areaStyle: { opacity: 0.12 }
+      }))
+    }]
+  });
+}
+
+function applyPreset() {
+  const selected = presets[presetSelect.value];
+  const url = new URL(location.href);
+  url.searchParams.set('ids', selected.join(','));
+  location.href = url.toString();
+}
+
+const barChart = echarts.init(document.getElementById('barChart'));
+const radarChart = echarts.init(document.getElementById('radarChart'));
+render(ids);
+window.addEventListener('resize', () => { barChart.resize(); radarChart.resize(); });
+</script>
+</body>
+</html>

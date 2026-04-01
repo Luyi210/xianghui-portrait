@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>复旦大学相辉学堂拔尖创新人才培养画像与高校对标平台 - 对标总览</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+  <link rel="stylesheet" href="assets/css/benchmark.css" />
+</head>
+<body>
+<div class="page">
+  <div class="brand-banner">
+    <div class="brand-hero">
+      <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+      <div class="brand-title">高校对标总览 · 拔尖创新人才培养项目</div>
+      <div class="brand-copy">本页展示国内外拔尖培养项目的总览卡片、分类、标签与比较维度。当前仅使用公开项目级信息的本地 demo 数据，不涉及任何私人学生数据。</div>
+    </div>
+    <div class="brand-nav">
+      <div class="brand-kicker">BENCHMARK OVERVIEW</div>
+      <div class="brand-copy">适合先回答“有哪些项目可以比较”“大致差异在哪里”，再进入单校详情页和多校比较页。</div>
+      <div class="brand-link-row">
+        <a class="brand-link" href="index_formal.html">群体画像</a>
+        <a class="brand-link" href="student_formal.html?id=20240062">个人画像</a>
+        <a class="brand-link" href="benchmark_compare.html">多校比较</a>
+        <a class="brand-link" href="data_methodology.html">数据方法</a>
+        <a class="brand-link" href="phase3_progress.md" target="_blank">阶段文档</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <h1>高校项目对标总览</h1>
+      <p>本轮重点把链接从“学校官网首页”推进到“项目介绍页 / honors 详情页 / 本科科研门户页 / 学院培养页”。页面气质也改成更像复旦专题档案，而不是通用蓝色驾驶舱。</p>
+    </div>
+    <div class="nav-row">
+      <a class="nav-link" href="benchmark_compare.html">进入多校比较</a>
+      <a class="nav-link" href="data_methodology.html">查看方法说明</a>
+      <a class="nav-link" href="policy_overview.html">管理者视角</a>
+    </div>
+  </div>
+
+  <div class="section-index">
+    <a class="index-pill" href="#cardSection">项目卡片</a>
+    <a class="index-pill" href="#tableSection">样本表</a>
+    <a class="index-pill" href="phase3_progress.md" target="_blank">阶段记录</a>
+  </div>
+
+  <div class="metric-grid" id="metricGrid"></div>
+
+  <div class="grid-main">
+    <div>
+      <div class="panel" id="cardSection">
+        <div class="panel-title">
+          <div>
+            <h3>项目卡片区</h3>
+            <div class="desc">点击卡片可进入项目详情页；也可按分类快速浏览。</div>
+          </div>
+          <div class="nav-row">
+            <select id="categoryFilter" class="select"></select>
+          </div>
+        </div>
+        <div id="cardGrid" class="card-grid"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-title">
+          <h3>比较维度说明</h3>
+          <div class="desc">分值仅为本地 demo 的结构化展示强度，不代表官方评判结论。</div>
+        </div>
+        <div class="bar-list" id="dimensionIntro"></div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-title">
+          <h3>学校分类与分布</h3>
+          <div class="desc">中国高校 / 海外高校 / 补充样本</div>
+        </div>
+        <div id="overviewChart" class="chart-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="tableSection" style="margin-top:16px;">
+    <div class="panel-title">
+      <h3>项目样本表</h3>
+      <div class="desc">页面间可互跳，后续可替换为 CSV/JSON 自动加载结果。</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>学校</th>
+            <th>项目</th>
+            <th>类别</th>
+            <th>学科覆盖</th>
+            <th>导师制</th>
+            <th>科研训练</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="footer-note">说明：当前数据以 <code>docs/benchmark_schema.csv</code> 和 <code>assets/js/benchmark_data.js</code> 为基础整理。为了兼容本地 file:// 打开，页面默认以内嵌 JS 数据为主；若后续改为 fetch 读取 CSV，则更建议通过简单本地服务打开。</div>
+  </div>
+</div>
+<script src="assets/js/benchmark_data.js"></script>
+<script>
+const stats = getBenchmarkStats();
+const metricGrid = document.getElementById('metricGrid');
+metricGrid.innerHTML = [
+  ['项目样本数', stats.total],
+  ['中国高校样本', stats.china],
+  ['海外高校样本', stats.overseas],
+  ['具体项目链接', stats.withProjectUrl]
+].map(([label, value]) => `<div class="metric-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+
+const categories = ['全部', ...new Set(BENCHMARK_DATA.map(item => item.category))];
+const filter = document.getElementById('categoryFilter');
+filter.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+filter.addEventListener('change', renderCards);
+
+const introData = [
+  ['导师制', '看项目是否提供稳定导师、导学联系与发展跟进。', 84],
+  ['科研训练', '看是否让本科生较早接触真实研究、实验室或项目训练。', 88],
+  ['国际交流', '看是否把海外学习、交换、国际课程嵌入培养路径。', 72],
+  ['资助支持', '看是否存在奖助、项目资助、制度托底与机会承接。', 68],
+  ['选拔机制', '看选拔是否公开透明、是否兼顾潜力识别。', 79],
+  ['学科覆盖', '看项目偏单一学科还是跨学科、通识与自由探索。', 83]
+];
+
+document.getElementById('dimensionIntro').innerHTML = introData.map(([k, t, v]) => `
+  <div class="note-card">
+    <div class="title">${k}</div>
+    <div class="text">${t}</div>
+    <div class="bar-track" style="margin-top:8px;"><div class="bar-fill" style="width:${v}%"></div></div>
+  </div>
+`).join('');
+
+function renderCards() {
+  const current = filter.value;
+  const rows = BENCHMARK_DATA.filter(item => current === '全部' || item.category === current);
+  document.getElementById('cardGrid').innerHTML = rows.map(item => `
+    <div class="school-card">
+      <div class="meta">${item.schoolTier} · ${item.region}</div>
+      <div class="title">${item.schoolName}｜${item.programName}</div>
+      <div class="text">${item.summary || item.trainingGoal}</div>
+      <div class="tag-row">${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+      <div class="text" style="margin-top:8px;">导师制 ${item.mentorSystem} · 科研训练 ${item.researchTraining} · 国际交流 ${item.internationalExchange}</div>
+      <div class="text" style="margin-top:8px; font-size:12px;">来源：${item.sourcePageType} · 选拔：${item.selection}</div>
+      <div class="link-row" style="margin-top:10px;">
+        <a class="btn" href="benchmark_detail.html?id=${item.id}">查看详情</a>
+        <a class="btn" href="benchmark_compare.html?ids=fudan-xh,${item.id}">加入对比</a>
+        <a class="btn" href="${item.projectUrl || item.officialUrl}" target="_blank" rel="noopener noreferrer">查看项目页面</a>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('tableBody').innerHTML = rows.map(item => `
+    <tr>
+      <td>${item.schoolName}</td>
+      <td>${item.programName}<br><a class="list-link" href="${item.projectUrl || item.officialUrl}" target="_blank" rel="noopener noreferrer">↗ 项目页面</a></td>
+      <td>${item.programType}</td>
+      <td>${item.disciplineScope}</td>
+      <td>${item.mentorSystem}</td>
+      <td>${item.researchTraining}</td>
+      <td><a class="btn" href="benchmark_detail.html?id=${item.id}">详情</a></td>
+    </tr>
+  `).join('');
+}
+renderCards();
+
+const chart = echarts.init(document.getElementById('overviewChart'));
+const categoryCount = categories.slice(1).map(c => ({ name: c, value: BENCHMARK_DATA.filter(item => item.category === c).length }));
+chart.setOption({
+  tooltip: { trigger: 'item' },
+  series: [{
+    type: 'pie',
+    radius: ['44%', '72%'],
+    data: categoryCount,
+    label: { color: '#5f4a3f' },
+    itemStyle: {
+      borderColor: 'rgba(255,251,246,0.92)',
+      borderWidth: 2
+    }
+  }]
+});
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

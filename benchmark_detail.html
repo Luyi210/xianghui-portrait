@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高校对标项目详情</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+  <link rel="stylesheet" href="assets/css/benchmark.css" />
+</head>
+<body class="detail-page">
+<div class="page">
+  <div class="brand-banner">
+    <div class="brand-hero">
+      <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+      <div class="brand-title">高校项目详情页</div>
+      <div class="brand-copy">支持通过 query 参数 <code>?id=...</code> 查看单个项目详情。当前展示内容优先落到具体项目页、学院页、本科科研页，而不是泛学校首页。</div>
+    </div>
+    <div class="brand-nav">
+      <div class="brand-kicker">BENCHMARK DETAIL</div>
+      <div class="brand-copy">本页用于看单校项目的培养目标、机制特征、标签与公开来源，不涉及任何私人数据。</div>
+      <div class="brand-link-row">
+        <a class="brand-link" href="benchmark_overview.html">对标总览</a>
+        <a class="brand-link" href="benchmark_compare.html">多校比较</a>
+        <a class="brand-link" href="data_methodology.html">数据方法</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <h1 id="pageTitle">项目详情</h1>
+      <p id="pageDesc">加载中…</p>
+    </div>
+    <div class="nav-row">
+      <a class="nav-link" href="benchmark_overview.html">返回总览</a>
+      <a class="nav-link" id="compareLink" href="benchmark_compare.html">加入比较</a>
+      <a class="nav-link" id="officialLink" href="#" target="_blank" rel="noopener noreferrer">项目页面</a>
+    </div>
+  </div>
+
+  <div class="section-index">
+    <a class="index-pill" href="#radarChart">项目画像</a>
+    <a class="index-pill" href="#detailTable">结构化字段</a>
+    <a class="index-pill" id="projectIndexLink" href="#" target="_blank" rel="noopener noreferrer">打开项目页</a>
+  </div>
+
+  <div class="metric-grid" id="metricGrid"></div>
+
+  <div class="grid-main">
+    <div>
+      <div class="panel">
+        <div class="panel-title"><h3>项目画像</h3><div class="desc">六个比较维度的轻量雷达图</div></div>
+        <div id="radarChart" class="chart-box"></div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-title"><h3>项目说明</h3><div class="desc">基于公开页面信息整理</div></div>
+        <div id="notesArea" class="bar-list"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-title"><h3>结构化字段</h3><div class="desc">用于后续 CSV / JSON / 后端统一接入</div></div>
+        <div class="table-wrap">
+          <table>
+            <tbody id="detailTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-title"><h3>项目标签</h3><div class="desc">帮助管理者快速理解项目气质</div></div>
+        <div id="tagArea" class="tag-row"></div>
+        <div class="footer-note">提示：这里的标签用于展示项目特征，不构成官方分类结论；后续可继续增加“书院制”“荣誉学位”“通识弹性”“住宿共同体”等标准化标签。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/js/benchmark_data.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || 'fudan-xh';
+const item = getBenchmarkById(id) || getBenchmarkById('fudan-xh');
+const detailChartText = '#6f6256';
+const detailChartLine = 'rgba(122, 31, 53, 0.14)';
+const detailSplitArea = ['rgba(122, 31, 53, 0.028)', 'rgba(215, 176, 122, 0.05)'];
+
+document.getElementById('pageTitle').innerText = `${item.schoolName}｜${item.programName}`;
+document.getElementById('pageDesc').innerText = `${item.programType} · ${item.targetStudents} · ${item.region}。当前仅展示公开项目级信息，并尽量直连项目介绍页、学院页或本科科研页面。`;
+document.getElementById('compareLink').href = `benchmark_compare.html?ids=fudan-xh,${item.id}`;
+document.getElementById('officialLink').href = item.projectUrl || item.officialUrl;
+document.getElementById('projectIndexLink').href = item.projectUrl || item.officialUrl;
+
+document.getElementById('metricGrid').innerHTML = [
+  ['导师制', item.mentorSystem],
+  ['科研训练', item.researchTraining],
+  ['国际交流', item.internationalExchange],
+  ['资助支持', item.fundingSupport]
+].map(([label, value]) => `<div class="metric-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+
+const detailFields = [
+  ['学校层级', item.schoolTier], ['学校名称', item.schoolName], ['项目名称', item.programName], ['项目类型', item.programType],
+  ['覆盖学科', item.disciplineScope], ['培养目标', item.trainingGoal], ['选拔方式', item.selectionMethod], ['项目页面', `<a class="list-link" href="${item.projectUrl || item.officialUrl}" target="_blank" rel="noopener noreferrer">打开具体页面</a>`], ['平台资源', item.platformResources],
+  ['成果展示', item.outcomeShowcase], ['来源页面', item.sourcePageType], ['最近整理', item.lastUpdated], ['备注', item.notes]
+];
+document.getElementById('detailTable').innerHTML = detailFields.map(([k,v]) => `<tr><th style="width:120px;">${k}</th><td>${v}</td></tr>`).join('');
+
+document.getElementById('tagArea').innerHTML = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+
+document.getElementById('notesArea').innerHTML = [
+  ['项目定位', item.trainingGoal],
+  ['导师机制', item.mentorText],
+  ['科研训练', item.researchText],
+  ['国际交流', item.internationalText],
+  ['资助支持', item.fundingText]
+].map(([title, text]) => `<div class="note-card"><div class="title">${title}</div><div class="text">${text}</div></div>`).join('');
+
+const chart = echarts.init(document.getElementById('radarChart'));
+chart.setOption({
+  radar: {
+    indicator: [
+      { name: '导师制', max: 100 }, { name: '科研训练', max: 100 }, { name: '国际交流', max: 100 },
+      { name: '资助支持', max: 100 }, { name: '选拔机制', max: 100 }, { name: '学科覆盖', max: 100 }
+    ],
+    axisName: { color: detailChartText },
+    splitLine: { lineStyle: { color: detailChartLine } },
+    splitArea: { areaStyle: { color: detailSplitArea } },
+    axisLine: { lineStyle: { color: 'rgba(122, 31, 53, 0.18)' } }
+  },
+  series: [{
+    type: 'radar',
+    data: [{
+      value: [item.mentorSystem, item.researchTraining, item.internationalExchange, item.fundingSupport, item.selectionScore, item.disciplineCoverage],
+      name: item.compareLabel,
+      areaStyle: { color: 'rgba(216,179,122,.22)' },
+      lineStyle: { color: '#b78456', width: 2 },
+      itemStyle: { color: '#b78456' }
+    }]
+  }]
+});
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

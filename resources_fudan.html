@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>相辉学堂人物画像系统 - 复旦资源与制度导航</title>
+    <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+    <style>
+        :root {
+            --bg: #f7f1ea;
+            --panel: rgba(255,251,246,0.84);
+            --line: rgba(122,31,53,0.12);
+            --gold: #c79a62;
+            --text: #4f3d34;
+            --muted: #74685f;
+            --blue: #93abc8;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "PingFang SC", sans-serif;
+            color: var(--text);
+            background:
+                linear-gradient(rgba(255,249,242,0.40), rgba(255,249,242,0.56)),
+                url('1.jpeg') center top / cover no-repeat fixed,
+                #f7f1ea;
+        }
+        .page { max-width: 1440px; margin: 0 auto; padding: 18px 18px 28px; }
+        .header, .panel {
+            background: linear-gradient(rgba(255,255,255,0.84), rgba(250,244,237,0.90));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(110,78,52,0.10);
+        }
+        .header { padding: 18px 20px; }
+        .header h1 { margin: 0; font-size: 30px; }
+        .header p { margin: 8px 0 0; color: var(--muted); line-height: 1.8; }
+        .badge { margin-top: 8px; color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+        .nav { margin-top: 14px; display:flex; gap:10px; flex-wrap:wrap; }
+        .btn {
+            display:inline-block; padding:9px 14px; border-radius:10px; text-decoration:none; color:var(--text);
+            border:1px solid var(--line); background:rgba(255,255,255,0.78);
+        }
+        .btn:hover { border-color: rgba(199,154,98,0.42); background: linear-gradient(135deg, rgba(255,251,245,0.94), rgba(246,232,209,0.82)); }
+        .grid { margin-top: 18px; display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .panel { padding: 18px; }
+        .panel h3 { margin: 0 0 12px; color: var(--gold); font-size: 18px; }
+        .panel .desc { color: var(--muted); font-size: 13px; line-height: 1.85; margin-bottom: 14px; }
+        .card-list { display:grid; gap: 12px; }
+        .card {
+            padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.74); border: 1px solid var(--line);
+        }
+        .card .title { font-weight: 700; margin-bottom: 8px; }
+        .card .text { color: var(--muted); line-height: 1.8; font-size: 13px; }
+        .card a { color: var(--blue); text-decoration: none; }
+        .card a:hover { text-decoration: underline; }
+        .tips { margin-top: 18px; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="brand-banner">
+        <div class="brand-hero">
+            <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+            <div class="brand-title">校内制度与资源入口 · 第一阶段整理</div>
+            <div class="brand-copy">优先建立“画像之后做什么”的基础资源层，为后续个性化推荐、分层支持与管理端配置留接口。</div>
+        </div>
+        <div class="brand-nav">
+            <div class="brand-kicker">RESOURCE NAVIGATION</div>
+            <div class="brand-copy">当前以静态页面为主，后续建议升级为 JSON / 后端配置驱动，降低维护成本。</div>
+            <div class="brand-link-row">
+                <a class="brand-link" href="index_formal.html">群体页</a>
+                <a class="brand-link" href="policy_overview.html">政策概要</a>
+                <a class="brand-link" href="phase1_plan.md" target="_blank">阶段文档</a>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <h1>复旦资源与制度导航</h1>
+        <p>这个页面不是单纯的信息堆叠，而是服务于“画像之后怎么办”。它把学生可能需要的制度说明、讲座入口、科研机会与支持资源整理在一起，便于老师、管理者或学生本人沿着画像结果继续行动。</p>
+        <div class="badge">FUDAN UNIVERSITY · RESOURCE NAVIGATION · XIANGHUI HALL</div>
+        <div class="nav">
+            <a class="btn" href="index_formal.html">返回群体驾驶舱</a>
+            <a class="btn" href="student_formal.html?id=20240062">查看个人画像样例</a>
+            <a class="btn" href="policy_overview.html">查看管理者政策概要</a>
+        </div>
+        <div class="card" style="margin-top:16px;">
+            <div class="title" style="color:var(--gold);">使用建议</div>
+            <div class="text">这页更适合在画像结论出来之后使用：如果学生是<strong>压力偏高</strong>，优先看学业制度与支持服务；如果是<strong>志趣待明确</strong>，优先看讲座活动；如果是<strong>科研参与不足</strong>，优先看科研机会与导师连接路径。</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel">
+            <h3>学业制度与课程弹性</h3>
+            <div class="desc">适合在解释压力调节、课程策略与培养节奏时提供制度背景，尤其适用于 P/NP、课程选择、培养方案理解等场景。</div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="title">P/NP 制度说明</div>
+                    <div class="text">适用于帮助学生理解课程弹性、风险控制与阶段性调节边界。<br><a href="https://jwc.fudan.edu.cn" target="_blank" rel="noopener noreferrer">打开复旦教务处</a></div>
+                </div>
+                <div class="card">
+                    <div class="title">培养方案与课程信息</div>
+                    <div class="text">可作为解释课程路径、阶段任务与学术节奏的重要依据。<br><a href="https://jwc.fudan.edu.cn" target="_blank" rel="noopener noreferrer">查看教务资源</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>讲座、学术活动与视野拓展</h3>
+            <div class="desc">适合为学术志趣不足、目标感偏弱或需要拓展视野的学生提供低门槛起点，也适合为表现优异的学生提供更高水平的外部刺激。</div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="title">复旦主页 / 活动信息</div>
+                    <div class="text">可作为讲座、校园活动和前沿信息的总入口。<br><a href="https://www.fudan.edu.cn" target="_blank" rel="noopener noreferrer">打开复旦大学官网</a></div>
+                </div>
+                <div class="card">
+                    <div class="title">院系学术讲座与公告</div>
+                    <div class="text">建议结合具体院系官网与公众号整理更细化入口，后续可以按学科方向继续补充。<br><a href="https://www.fudan.edu.cn" target="_blank" rel="noopener noreferrer">先从学校主页进入</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>科研机会与发展平台</h3>
+            <div class="desc">适用于科研参与不足、需要从课程任务迈向真实研究，或需要进一步深化科研能力的学生。</div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="title">FDUROP / 本科科研机会</div>
+                    <div class="text">适合为有研究潜力、需要平台承接的学生提供项目化入口。<br><a href="https://jwc.fudan.edu.cn" target="_blank" rel="noopener noreferrer">查看教务处相关信息</a></div>
+                </div>
+                <div class="card">
+                    <div class="title">导师与课题组接触路径</div>
+                    <div class="text">可结合学院、书院或相辉学堂实际机制设计更明确的导师对接方式，后续建议继续补充成校内制度图谱。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>心理支持与学生发展服务</h3>
+            <div class="desc">适用于压力偏高、心理健康维度偏低、目标感不稳、支持网络不足等情况。强调正式支持与温和介入，而不是把学生问题化。</div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="title">心理与学生支持入口</div>
+                    <div class="text">建议结合学校心理中心、学生工作系统与院系支持资源进一步细化。<br><a href="https://www.fudan.edu.cn" target="_blank" rel="noopener noreferrer">从复旦官网进入相关服务</a></div>
+                </div>
+                <div class="card">
+                    <div class="title">画像后的行动建议</div>
+                    <div class="text">对于支持型学生，优先给低门槛动作；对于表现优异学生，优先给更高水平的拓展性机会，而不是泛泛增加任务。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel tips">
+        <h3>后续可继续补强的方向</h3>
+        <div class="card-list">
+            <div class="card"><div class="title">按学科方向补链接</div><div class="text">比如物理、数学、化学、生物、计算机分别补各自讲座、实验室、项目入口。</div></div>
+            <div class="card"><div class="title">按学生状态推荐资源</div><div class="text">未来可以和个人画像页联动，不同类型学生看到不同资源优先级。</div></div>
+            <div class="card"><div class="title">形成可维护资源库</div><div class="text">后续可把资源整理为 JSON / 后端配置表，避免每次都手改 HTML。</div></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

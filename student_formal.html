@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>相辉学堂人物画像系统 - 个人画像驾驶舱</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+        html, body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            background-color: #f6f1ea !important;
+        }
+        @media print {
+            html, body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                background: #f6f1ea !important;
+            }
+            body {
+                min-height: auto !important;
+            }
+            .assistant-fab,
+            .assistant-panel,
+            .overlay {
+                display: none !important;
+            }
+            .page {
+                padding: 8mm !important;
+                min-height: auto !important;
+            }
+            .header,
+            .panel,
+            .kpi,
+            .type-card,
+            .summary-card,
+            .risk-item,
+            .signal-card,
+            .advice-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+        :root {
+            --bg: #f6f1ea;
+            --panel: rgba(255,251,246,0.84);
+            --panel-soft: rgba(255,248,242,0.88);
+            --line: rgba(122,31,53,0.12);
+            --gold: #c79a62;
+            --blue: #93abc8;
+            --cyan: #63e6ff;
+            --text: #4f3d34;
+            --muted: #74685f;
+            --red: #f87171;
+            --yellow: #fbbf24;
+            --green: #4ade80;
+        }
+        * { box-sizing: border-box; }
+        html, body { min-height: 100%; }
+        body {
+            margin: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-family: "PingFang SC", sans-serif;
+            background:
+                linear-gradient(rgba(255,249,242,0.38), rgba(255,249,242,0.54)),
+                radial-gradient(circle at 14% 0%, rgba(122,31,53,0.06), transparent 28%),
+                radial-gradient(circle at 82% 10%, rgba(226,192,141,0.10), transparent 20%),
+                radial-gradient(circle at 100% 100%, rgba(0,170,255,0.06), transparent 30%),
+                url('1.jpeg') center top / cover no-repeat fixed,
+                linear-gradient(180deg, #fbf7f2 0%, #efe5da 100%);
+            color: var(--text);
+        }
+        .page {
+            min-height: 100vh;
+            padding: 18px 18px 26px;
+            display: grid;
+            grid-template-rows: auto auto minmax(600px, 1fr);
+            gap: 16px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(250,244,237,0.90));
+            border: 1px solid rgba(122,31,53,0.12);
+            border-top: 1px solid rgba(199,154,98,0.24);
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 16px 34px rgba(110,78,52,0.10);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: 'XIANGHUI DOSSIER · FUDAN UNIVERSITY';
+            position: absolute;
+            right: 18px;
+            top: 12px;
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            color: rgba(79,61,52,0.28);
+        }
+        .header h1::after {
+            content: ' 复旦大学';
+            color: rgba(226,192,141,0.9);
+            font-size: 14px;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.6px; }
+        .header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+        .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(250,244,237,0.88));
+            border: 1px solid var(--line);
+        }
+        .status-left { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(199,154,98,0.12);
+            border: 1px solid rgba(199,154,98,0.20);
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+        }
+        .btn {
+            background: rgba(255,255,255,0.78);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 9px 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .18s ease;
+        }
+        .btn:hover {
+            border-color: rgba(199,154,98,0.42);
+            background: linear-gradient(135deg, rgba(255,251,245,0.94), rgba(246,232,209,0.82));
+            transform: translateY(-1px);
+        }
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 150px));
+            justify-content: center;
+            gap: 14px;
+            max-width: 990px;
+            margin: 4px auto 0;
+        }
+        .kpi {
+            background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(248,241,234,0.90));
+            border: 1px solid rgba(122,31,53,0.10);
+            border-radius: 14px;
+            padding: 10px 12px;
+            min-height: 78px;
+            box-shadow: 0 10px 20px rgba(110,78,52,0.08);
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(199,154,98,0.72), rgba(147,171,200,0.20));
+        }
+        .kpi .label { color: var(--muted); font-size: 10px; line-height: 1.3; }
+        .kpi .value { margin-top: 7px; color: var(--gold); font-size: 22px; font-weight: 700; line-height: 1.1; }
+        .main {
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1.2fr) 380px;
+            gap: 18px;
+            min-height: 0;
+            align-items: start;
+        }
+        .col {
+            min-height: 0;
+            display: grid;
+            gap: 14px;
+        }
+        .panel {
+            min-height: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(248,241,234,0.90));
+            border: 1px solid rgba(122,31,53,0.10);
+            border-top: 1px solid rgba(199,154,98,0.14);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 18px 34px rgba(110,78,52,0.10);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .panel-title h3 { margin: 0; font-size: 17px; color: var(--gold); letter-spacing: 0.2px; }
+        .panel-title .desc { color: var(--muted); font-size: 12px; }
+        .profile h2 { margin: 0 0 8px; color: var(--gold); font-size: 30px; letter-spacing: 0.4px; }
+        .muted { color: var(--muted); }
+        .tag {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .red { background: rgba(248,113,113,0.18); color: var(--red); }
+        .yellow { background: rgba(251,191,36,0.18); color: var(--yellow); }
+        .green { background: rgba(74,222,128,0.18); color: var(--green); }
+        .none { background: rgba(125,183,255,0.15); color: var(--blue); }
+        .profile-grid {
+            display: grid;
+            gap: 8px 16px;
+            margin-top: 16px;
+            grid-template-columns: 1fr;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(122,31,53,0.08);
+            font-size: 13px;
+        }
+        .info-item span:first-child { color: var(--muted); }
+        .info-item span:last-child { text-align: right; font-weight: 600; }
+        .type-card, .summary-card, .risk-item, .signal-card, .advice-card, .resource-card, .highlight-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,241,234,0.88));
+            border: 1px solid rgba(122,31,53,0.10);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(110,78,52,0.06);
+            transition: border-color .18s ease, transform .18s ease, background .18s ease;
+        }
+        .summary-card:hover, .risk-item:hover, .signal-card:hover, .advice-card:hover, .resource-card:hover, .highlight-card:hover {
+            border-color: rgba(199,154,98,0.20);
+            background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(246,232,209,0.84));
+            transform: translateY(-1px);
+        }
+        .type-card { margin-top: 14px; position: relative; overflow: hidden; }
+        .type-card::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(199,154,98,0.72), rgba(147,171,200,0.18));
+        }
+        .chart {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .compare-table th, .compare-table td { padding: 9px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+        .compare-table th { color: var(--muted); font-weight: 500; }
+        .tabbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; padding-bottom: 2px; }
+        .tab {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.74);
+            cursor: pointer;
+            color: var(--muted);
+            transition: all .18s ease;
+        }
+        .tab:hover {
+            color: var(--text);
+            border-color: rgba(199,154,98,0.28);
+            background: rgba(255,255,255,0.82);
+        }
+        .tab.active {
+            color: var(--text);
+            border-color: rgba(199,154,98,0.42);
+            background: linear-gradient(180deg, rgba(199,154,98,0.16), rgba(199,154,98,0.08));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .tab-panel { display: none; min-height: 0; flex: 1; overflow: auto; }
+        .tab-panel.active { display: block; }
+        .dim-list, .risk-list, .advice-list, .signal-list { display: grid; gap: 10px; }
+        .dim-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .bar { height: 10px; border-radius: 999px; background: rgba(122,31,53,0.08); overflow: hidden; }
+        .bar > span { display: block; height: 100%; background: linear-gradient(90deg, #93abc8, #c79a62); }
+        .risk-item .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .risk-item .text, .advice-card .text, .summary-card .text, .highlight-card .text, .resource-card .text {
+            color: var(--muted);
+            line-height: 1.78;
+            font-size: 13px;
+        }
+        .highlight-list, .resource-list { display:grid; gap:10px; }
+        .resource-card a { color: var(--blue); text-decoration: none; }
+        .resource-card a:hover { text-decoration: underline; }
+        .signal-list { grid-template-columns: 1fr 1fr; gap: 10px; }
+        .signal-card { padding: 13px 14px; }
+        .signal-card .key { color: var(--muted); font-size: 12px; line-height: 1.4; }
+        .signal-card .value { margin-top: 8px; font-size: 18px; color: var(--gold); font-weight: 700; }
+        .adv-shortcuts { display: grid; gap: 10px; }
+        .mini-title {
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+        .assistant-fab {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 1px solid rgba(199,154,98,0.34);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.62), transparent 35%), linear-gradient(135deg, #c99b5a, #e7c790 62%, #f4e3c3);
+            color: #fff;
+            box-shadow: 0 16px 28px rgba(188,148,91,0.26);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 30;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2;
+            font-size: 12px;
+        }
+        .assistant-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 98px;
+            width: 360px;
+            height: 520px;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248,241,234,0.96));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 24px 48px rgba(110,78,52,0.16);
+            overflow: hidden;
+            z-index: 31;
+        }
+        .assistant-panel.show { display: flex; }
+        .assistant-head { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+        .assistant-quick { padding: 10px 12px; border-bottom: 1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; }
+        .quick-chip { padding: 6px 10px; border-radius: 999px; background: rgba(199,154,98,0.12); border: 1px solid rgba(199,154,98,0.22); color: var(--gold); font-size: 12px; cursor: pointer; }
+        .assistant-body { flex: 1; overflow: auto; padding: 14px; display: grid; gap: 10px; }
+        .assistant-msg { padding: 10px 12px; border-radius: 12px; line-height: 1.7; font-size: 13px; max-width: 92%; }
+        .assistant-msg.ai { background: rgba(255,255,255,0.78); color: var(--text); }
+        .assistant-msg.user { background: rgba(199,154,98,0.18); color: var(--text); justify-self: end; }
+        .assistant-foot { padding: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+        .assistant-input { background: rgba(255,255,255,0.88); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(112,92,69,0.20);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+        }
+        .overlay.show { display: flex; }
+        .detail-modal {
+            width: min(980px, 86vw);
+            height: min(680px, 82vh);
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,241,234,0.98));
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(110,78,52,0.18);
+            display: grid;
+            grid-template-rows: 56px 1fr;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 18px;
+            border-bottom: 1px solid var(--line);
+        }
+        @media (max-width: 1480px) {
+            .kpis {
+                grid-template-columns: repeat(6, minmax(0, 144px));
+                justify-content: center;
+                max-width: 948px;
+            }
+            .main { grid-template-columns: 290px minmax(0, 1fr) 330px; }
+            .signal-list { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 1280px) {
+            .page {
+                grid-template-rows: auto auto 1fr;
+                min-height: 100vh;
+            }
+            .main {
+                grid-template-columns: 1fr;
+            }
+            .col {
+                min-height: auto;
+            }
+            .chart {
+                min-height: 320px;
+            }
+            .kpis {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                justify-content: stretch;
+                max-width: none;
+            }
+            .profile-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 860px) {
+            .page { padding: 12px; gap: 12px; }
+            .brand-banner { grid-template-columns: 1fr; }
+            .header { grid-template-columns: 1fr; }
+            .header h1 { font-size: 26px; }
+            .toolbar { flex-wrap: wrap; justify-content: flex-start; }
+            .status-bar { flex-direction: column; align-items: flex-start; }
+            .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .panel { padding: 14px; }
+            .profile h2 { font-size: 24px; }
+            .chart { min-height: 280px; }
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+            .kpis { grid-template-columns: 1fr; }
+            .header h1 { font-size: 22px; }
+            .btn { width: 100%; text-align: center; }
+            .status-left { width: 100%; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .page > * { animation: fadeInUp .4s ease both; }
+        .page > *:nth-child(2) { animation-delay:.05s; }
+        .page > *:nth-child(3) { animation-delay:.10s; }
+        .page > *:nth-child(4) { animation-delay:.15s; }
+        .error-banner {
+            margin: 24px; padding: 18px 20px; border-radius: 14px;
+            background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3);
+            color: var(--red); font-size: 15px; line-height: 1.7;
+        }
+        .error-banner strong { display: block; margin-bottom: 6px; }
+        @keyframes countUp {
+            from { opacity: 0.3; transform: translateY(4px); }
+            to   { opacity: 1;   transform: translateY(0); }
+        }
+        .kpi .value.animating { animation: countUp .5s ease; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="brand-banner">
+        <div class="brand-hero">
+            <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+            <div class="brand-title">相辉学堂人物画像 · 个体成长报告</div>
+            <div class="brand-copy">保留原有画像结构与接口调用，仅对品牌氛围、学术视觉与导航关系做第一阶段低风险增强。</div>
+        </div>
+        <div class="brand-nav">
+            <div class="brand-kicker">STUDENT PORTRAIT</div>
+            <div class="brand-copy">建议后续将“问题解释—资源入口—支持动作”串成闭环，让画像页真正承接培养行动。</div>
+            <div class="brand-link-row">
+                <a class="brand-link" href="index_formal.html">群体驾驶舱</a>
+                <a class="brand-link" href="resources_fudan.html" target="_blank">资源导航</a>
+                <a class="brand-link" href="benchmark_overview.html" target="_blank">高校对标</a>
+                <a class="brand-link" href="data_methodology.html" target="_blank">数据方法</a>
+                <a class="brand-link" href="phase2_progress.md" target="_blank">阶段文档</a>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <div>
+            <h1>个人画像报告</h1>
+            <p>复旦大学相辉学堂学生发展画像展示页</p>
+            <div class="status-bar">
+                <div class="status-left" id="portraitStatus"></div>
+            </div>
+        </div>
+        <div class="toolbar">
+            <a href="index_formal.html" class="btn">返回群体驾驶舱</a>
+            <a href="resources_fudan.html" class="btn" target="_blank">复旦资源导航</a>
+            <a href="policy_overview.html" class="btn" target="_blank">管理者政策概要</a>
+            <a href="benchmark_overview.html" class="btn" target="_blank">高校对标总览</a>
+        </div>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><div class="label">学术志趣</div><div class="value" id="kpiInterest">--</div></div>
+        <div class="kpi"><div class="label">科研参与</div><div class="value" id="kpiResearch">--</div></div>
+        <div class="kpi"><div class="label">心理健康</div><div class="value" id="kpiMental">--</div></div>
+        <div class="kpi"><div class="label">当前类型</div><div class="value" id="kpiType" style="font-size:20px;">--</div></div>
+        <div class="kpi"><div class="label">类型置信度</div><div class="value" id="kpiConfidence">--</div></div>
+        <div class="kpi"><div class="label">风险条数</div><div class="value" id="kpiWarningCount">--</div></div>
+    </div>
+
+    <div class="main">
+        <div class="col">
+            <div class="panel profile" style="flex: 1;">
+                <div class="panel-title">
+                    <div>
+                        <h3>个人档案</h3>
+                        <div class="desc" id="studentId">学号：--</div>
+                    </div>
+                    <span id="warningTag" class="tag none">none</span>
+                </div>
+                <h2 id="name">--</h2>
+                <div class="muted" id="typeFeature">--</div>
+                <div class="profile-grid">
+                    <div class="info-item"><span>年级</span><span id="grade">--</span></div>
+                    <div class="info-item"><span>学科方向</span><span id="major">--</span></div>
+                    <div class="info-item"><span>入学方式</span><span id="admission">--</span></div>
+                    <div class="info-item"><span>生源省份</span><span id="province">--</span></div>
+                    <div class="info-item"><span>生源地类型</span><span id="regionType">--</span></div>
+                    <div class="info-item"><span>高中层级</span><span id="highSchool">--</span></div>
+                    <div class="info-item"><span>家庭阶层自评</span><span id="familyClass">--</span></div>
+                </div>
+                <div class="type-card">
+                    <div class="mini-title">类型归属</div>
+                    <div style="font-size:24px; color:var(--gold); font-weight:700;" id="studentType">--</div>
+                    <div class="muted" style="margin-top:8px; line-height:1.7;">相邻类型：<span id="adjacentType">--</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="panel" style="flex: 1.18; min-height: 480px;">
+                <div class="panel-title">
+                    <h3>八大核心维度雷达图</h3>
+                    <span class="desc">核心画像主图</span>
+                </div>
+                <div id="radarChart" class="chart"></div>
+            </div>
+            <div class="panel" style="flex: 0.92; min-height: 360px;">
+                <div class="panel-title">
+                    <h3>成长轨迹与类型对照</h3>
+                    <span class="desc">成长与类型对照</span>
+                </div>
+                <div style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:12px; min-height:0; flex:1;">
+                    <div id="growthChart" class="chart"></div>
+                    <div style="overflow:auto;">
+                        <table class="compare-table">
+                            <thead>
+                                <tr>
+                                    <th>维度</th>
+                                    <th>我</th>
+                                    <th id="currentTypeHead">当前类型</th>
+                                    <th id="adjacentTypeHead">相邻类型</th>
+                                </tr>
+                            </thead>
+                            <tbody id="typeCompareTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="panel" style="flex: 1;">
+                <div class="panel-title">
+                    <div>
+                        <h3>问题清单 / 建议路径 / 细分信号</h3>
+                        <div class="desc">问题、建议与信号整合区</div>
+                    </div>
+                </div>
+                <div class="tabbar">
+                    <div class="tab active" data-tab="highlights" onclick="switchTab('highlights')">优势与关注</div>
+                    <div class="tab" data-tab="dimensions" onclick="switchTab('dimensions')">维度明细</div>
+                    <div class="tab" data-tab="advice" onclick="switchTab('advice')">行动建议</div>
+                    <div class="tab" data-tab="resources" onclick="switchTab('resources')">校内资源</div>
+                    <div class="tab" data-tab="signals" onclick="switchTab('signals')">关键信号</div>
+                </div>
+
+                <div id="tab-highlights" class="tab-panel active">
+                    <div class="summary-card" id="issueSummary"></div>
+                    <div id="highlightList" class="highlight-list" style="margin-top:10px;"></div>
+                    <div id="riskList" class="risk-list" style="margin-top:10px;"></div>
+                </div>
+
+                <div id="tab-dimensions" class="tab-panel">
+                    <div id="dimensionList" class="dim-list"></div>
+                </div>
+
+                <div id="tab-advice" class="tab-panel">
+                    <div id="adviceList" class="advice-list"></div>
+                </div>
+
+                <div id="tab-resources" class="tab-panel">
+                    <div id="resourceList" class="resource-list"></div>
+                </div>
+
+                <div id="tab-signals" class="tab-panel">
+                    <div id="rawSignals" class="signal-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="assistant-fab" onclick="toggleAssistant()">相辉<br>小助手</div>
+<div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-head">
+        <div style="font-weight:700; color:var(--gold);">相辉小助手</div>
+        <div class="muted" style="font-size:12px; margin-top:4px;">可结合当前学生画像与 200 名学生整体数据回答</div>
+    </div>
+    <div class="assistant-quick">
+        <div class="quick-chip" onclick="quickAsk('这个学生最大的优势是什么？','student')">学生优势</div>
+        <div class="quick-chip" onclick="quickAsk('这个学生当前最需要关注什么？','student')">重点关注</div>
+        <div class="quick-chip" onclick="quickAsk('请解释这个学生的建议路径。','student')">建议路径</div>
+    </div>
+    <div class="assistant-body" id="assistantBody">
+        <div class="assistant-msg ai">你好，我是相辉小助手。你可以直接问我：这个学生的主要特点是什么？有哪些风险？建议路径是什么？我会结合当前画像和整体数据来回答。</div>
+    </div>
+    <div class="assistant-foot">
+        <input id="assistantInput" class="assistant-input" placeholder="请输入你的问题..." />
+        <button class="btn" onclick="sendAssistantMessage('student')">发送</button>
+    </div>
+</div>
+
+<div class="overlay" id="detailOverlay">
+    <div class="detail-modal">
+        <div class="modal-header">
+            <div>
+                <div id="detailTitle">详情</div>
+                <div class="muted" id="detailSubtitle" style="font-size:12px; margin-top:4px;">当前模块的扩展说明与可视化</div>
+            </div>
+            <div class="toolbar">
+                <button class="btn" onclick="closeDetailOverlay()">关闭</button>
+            </div>
+        </div>
+        <div style="padding:16px; display:grid; grid-template-rows: 1fr auto; gap:12px; min-height:0;">
+            <div id="detailChart" style="width:100%; height:100%; min-height:320px;"></div>
+            <div id="detailText" class="summary-card" style="overflow:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const api = '/api/formal';
+const params = new URLSearchParams(location.search);
+const studentId = params.get('id') || '20240001';
+const chartText = '#6b5d52';
+const chartLine = 'rgba(122,31,53,0.18)';
+const chartSplit = 'rgba(122,31,53,0.08)';
+const chartLegend = '#5f4a3f';
+const chartGold = '#c79a62';
+const chartBlue = '#93abc8';
+const chartGoldArea = 'rgba(199,154,98,0.22)';
+let radarChart, growthChart, detailChart;
+let currentData = null;
+
+// Esc 关闭详情弹窗
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('detailOverlay').classList.contains('show')) closeDetailOverlay();
+        else if (document.getElementById('assistantPanel').classList.contains('show')) toggleAssistant();
+    }
+});
+
+function showErrorBanner(msg) {
+    const page = document.querySelector('.page');
+    const banner = document.createElement('div');
+    banner.className = 'error-banner';
+    banner.innerHTML = `<strong>加载失败</strong>${msg}<br><br><button class="btn" onclick="location.reload()">重新加载</button>`;
+    page.prepend(banner);
+}
+
+function levelClass(level) {
+    return ['red','yellow','green','none'].includes(level) ? level : 'none';
+}
+
+function riskTitle(severity) {
+    if (severity === 'red') return '一级预警';
+    if (severity === 'yellow') return '二级预警';
+    if (severity === 'green') return '一般关注';
+    return '提示';
+}
+
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === name));
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.toggle('active', el.id === `tab-${name}`));
+}
+
+function updatePortraitStatus() {
+    if (!currentData) return;
+    const p = currentData.portrait;
+    const strengths = getStrengthItems();
+    const focus = currentData.issues.risk_tags[0]?.label || '当前无明显高风险';
+    document.getElementById('portraitStatus').innerHTML = [
+        `<span class="chip">类型：${p.student_type}</span>`,
+        `<span class="chip">置信度：${p.student_type_confidence}%</span>`,
+        `<span class="chip">预警：${p.warning_level}</span>`,
+        `<span class="chip">优势：${strengths[0] || '整体较均衡'}</span>`,
+        `<span class="chip">关注：${focus}</span>`
+    ].join('');
+}
+
+function getStrengthItems() {
+    if (!currentData) return [];
+    return currentData.dimensions.filter(d => d.score >= 70).sort((a, b) => b.score - a.score).map(d => d.label);
+}
+
+function getConcernItems() {
+    if (!currentData) return [];
+    const risks = currentData.issues.risk_tags.map(r => r.label);
+    if (risks.length) return risks;
+    return currentData.dimensions.filter(d => d.score <= 55).sort((a, b) => a.score - b.score).map(d => d.label);
+}
+
+function buildEncouragementText() {
+    if (!currentData) return '该生当前整体状态稳定。';
+    const p = currentData.portrait;
+    const strengths = getStrengthItems();
+    if (p.warning_level === 'none' || p.warning_level === 'green') {
+        return strengths.length
+            ? `该生当前整体发展较为稳定，尤其在${strengths.slice(0, 2).join('、')}方面已有较明显优势，后续更适合做有节奏的深化发展。`
+            : '该生当前整体表现较均衡，已经具备继续向上发展的良好基础。';
+    }
+    return strengths.length
+        ? `该生虽然当前存在一些需要支持的方面，但在${strengths.slice(0, 2).join('、')}上已经表现出一定潜力，这是后续干预和支持的重要起点。`
+        : '该生当前虽有一些压力或短板，但仍具备继续改善和成长的空间，建议从小步、可执行的支持动作开始。';
+}
+
+function openDetailOverlay(title, html, subtitle='当前模块的扩展说明与可视化') {
+    document.getElementById('detailTitle').innerText = title;
+    document.getElementById('detailSubtitle').innerText = subtitle;
+    document.getElementById('detailText').innerHTML = html || '';
+    document.getElementById('detailOverlay').classList.add('show');
+    if (!detailChart) detailChart = echarts.init(document.getElementById('detailChart'));
+    setTimeout(() => detailChart && detailChart.resize(), 60);
+}
+
+function closeDetailOverlay() {
+    document.getElementById('detailOverlay').classList.remove('show');
+    if (detailChart) detailChart.clear();
+    document.getElementById('detailText').innerHTML = '';
+}
+
+function openDimensionDetail(label) {
+    if (!currentData) return;
+    const item = currentData.dimensions.find(d => d.label === label);
+    if (!item) return;
+    openDetailOverlay(`维度详情：${label}`, `
+        <div class="mini-title">当前维度解读</div>
+        <div class="text">当前得分 ${item.score}，百分位 P${item.percentile}，处于“${item.zone}”。这代表该生在该维度上相对群体的位置已经比较明确，可作为个体优势或关注点解释依据。</div>
+    `);
+    detailChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: 36, right: 20, top: 30, bottom: 28 },
+        xAxis: { type: 'category', data: ['本人得分', '同年级均值', '百分位'], axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } },
+        yAxis: { type: 'value', min: 0, max: 100, axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+        series: [{ type: 'bar', data: [item.score, currentData.radar.grade_avg_scores[currentData.radar.labels.indexOf(label)], item.percentile], itemStyle: { color: chartGold, borderRadius: [8,8,0,0] } }]
+    });
+}
+
+function openGrowthDetail(seriesName) {
+    if (!currentData) return;
+    const values = currentData.growth.series[seriesName];
+    if (!values) return;
+    openDetailOverlay(`成长轨迹详情：${seriesName}`, `
+        <div class="mini-title">趋势解释</div>
+        <div class="text">该维度当前展示的是示意版成长轨迹，用于表达从入学前到当前的大致变化趋势。后续接入真实多学期数据后，这里可以换成真实纵向追踪曲线。</div>
+    `);
+    detailChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: 36, right: 20, top: 30, bottom: 28 },
+        xAxis: { type: 'category', data: currentData.growth.labels, axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } },
+        yAxis: { type: 'value', min: 0, max: 100, axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+        series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 3, color: chartGold }, symbolSize: 8, itemStyle: { color: chartGold } }]
+    });
+}
+
+function openRiskDetail(index) {
+    if (!currentData) return;
+    const risk = currentData.issues.risk_tags[index];
+    if (!risk) return;
+    openDetailOverlay(`风险详情：${risk.label}`, `
+        <div class="mini-title">风险说明</div>
+        <div class="text">${risk.description || '暂无解释。'}</div>
+        <div class="mini-title" style="margin-top:10px;">对应建议</div>
+        <div class="text">${currentData.advice.psychology}<br><br>${currentData.advice.resource}</div>
+    `);
+    detailChart.setOption({
+        radar: { indicator: currentData.radar.labels.map(name => ({ name, max: 100 })), axisName: { color: chartText }, splitLine: { lineStyle: { color: 'rgba(122,31,53,0.10)' } }, splitArea: { areaStyle: { color: ['rgba(122,31,53,0.025)', 'rgba(215,176,122,0.05)'] } }, axisLine: { lineStyle: { color: 'rgba(122,31,53,0.14)' } } },
+        series: [{ type: 'radar', data: [{ value: currentData.radar.my_scores, name: '本人', areaStyle: { color: chartGoldArea }, itemStyle: { color: chartGold }, lineStyle: { color: chartGold } }] }]
+    });
+}
+
+function openAdviceDetail(title, text) {
+    openDetailOverlay(title, `<div class="mini-title">建议详情</div><div class="text">${text}</div>`);
+    detailChart.setOption({
+        xAxis: { type: 'category', data: ['优先级', '可执行度', '资源依赖'], axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } },
+        yAxis: { type: 'value', min: 0, max: 100, axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+        grid: { left: 36, right: 20, top: 30, bottom: 28 },
+        series: [{ type: 'bar', data: [82, 76, 58], itemStyle: { color: chartGold, borderRadius: [8,8,0,0] } }]
+    });
+}
+
+function toggleAssistant() { document.getElementById('assistantPanel').classList.toggle('show'); }
+function quickAsk(text, page) { document.getElementById('assistantInput').value = text; sendAssistantMessage(page); }
+
+async function sendAssistantMessage(page) {
+    const input = document.getElementById('assistantInput');
+    const body = document.getElementById('assistantBody');
+    const q = input.value.trim();
+    if (!q) return;
+    body.innerHTML += `<div class="assistant-msg user">${q}</div>`;
+    input.value = '';
+    body.innerHTML += `<div class="assistant-msg ai" id="assistantLoading">相辉小助手正在思考...</div>`;
+    body.scrollTop = body.scrollHeight;
+    try {
+        const res = await axios.post(`${api}/ai_chat`, { question: q, page, student_id: Number(studentId) });
+        const loading = document.getElementById('assistantLoading');
+        if (loading) loading.remove();
+        body.innerHTML += `<div class="assistant-msg ai">${res.data.answer}</div>`;
+    } catch (e) {
+        const loading = document.getElementById('assistantLoading');
+        if (loading) loading.remove();
+        body.innerHTML += `<div class="assistant-msg ai">相辉小助手暂时连接失败，请稍后再试。</div>`;
+    }
+    body.scrollTop = body.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('assistantInput');
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') sendAssistantMessage('student'); });
+});
+
+async function init() {
+    try {
+        const res = await axios.get(`${api}/student/${studentId}`);
+        const data = res.data;
+        if (data.status !== 'success') {
+            showErrorBanner(data.message || '未找到该学生，请检查学号是否正确。');
+            return;
+        }
+
+        currentData = data;
+        updatePortraitStatus();
+        const b = data.basic;
+        const p = data.portrait;
+        document.getElementById('name').innerText = b.name;
+        document.getElementById('studentId').innerText = `学号：${b.student_id}`;
+        document.getElementById('grade').innerText = b.grade;
+        document.getElementById('major').innerText = b.major_track;
+        document.getElementById('admission').innerText = b.admission_type;
+        document.getElementById('province').innerText = b.source_province;
+        document.getElementById('regionType').innerText = b.source_region_type;
+        document.getElementById('highSchool').innerText = b.high_school_level;
+        document.getElementById('familyClass').innerText = b.family_class_score;
+        document.getElementById('studentType').innerText = p.student_type;
+        document.getElementById('typeFeature').innerText = p.type_features;
+        document.getElementById('adjacentType').innerText = p.adjacent_type;
+        document.getElementById('warningTag').className = `tag ${levelClass(p.warning_level)}`;
+        document.getElementById('warningTag').innerText = `${p.warning_level} · ${p.warning_count}项风险`;
+
+        const dimMap = Object.fromEntries(data.dimensions.map(d => [d.label, d]));
+        document.getElementById('kpiInterest').innerText = dimMap['学术志趣'].score;
+        document.getElementById('kpiResearch').innerText = dimMap['科研参与'].score;
+        document.getElementById('kpiMental').innerText = dimMap['心理健康'].score;
+        document.getElementById('kpiType').innerText = p.student_type;
+        document.getElementById('kpiConfidence').innerText = `${p.student_type_confidence}%`;
+        document.getElementById('kpiWarningCount').innerText = p.warning_count;
+
+        radarChart = echarts.init(document.getElementById('radarChart'));
+        radarChart.setOption({
+            tooltip: {},
+            legend: { data: ['本人', '同年级均值'], textStyle: { color: chartLegend }, bottom: 0 },
+            radar: {
+                indicator: data.radar.labels.map(name => ({ name, max: 100 })),
+                splitArea: { areaStyle: { color: ['rgba(122,31,53,0.025)', 'rgba(215,176,122,0.05)'] } },
+                axisName: { color: chartText },
+                splitLine: { lineStyle: { color: 'rgba(122,31,53,0.10)' } },
+                axisLine: { lineStyle: { color: 'rgba(122,31,53,0.14)' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: data.radar.my_scores, name: '本人', itemStyle: { color: chartGold }, lineStyle: { color: chartGold, width: 2 }, areaStyle: { color: chartGoldArea } },
+                    { value: data.radar.grade_avg_scores, name: '同年级均值', itemStyle: { color: chartBlue }, lineStyle: { type: 'dashed', color: chartBlue, width: 2 }, areaStyle: { opacity: 0 } }
+                ]
+            }]
+        });
+        radarChart.off('click');
+        radarChart.on('click', params => openDimensionDetail(params.name));
+
+        growthChart = echarts.init(document.getElementById('growthChart'));
+        growthChart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: Object.keys(data.growth.series), textStyle: { color: chartLegend }, top: 0 },
+            grid: { left: 26, right: 10, top: 34, bottom: 24 },
+            xAxis: {
+                type: 'category',
+                data: data.growth.labels,
+                axisLabel: { color: chartText },
+                axisLine: { lineStyle: { color: chartLine } }
+            },
+            yAxis: {
+                type: 'value', min: 0, max: 100,
+                axisLabel: { color: chartText },
+                splitLine: { lineStyle: { color: chartSplit } }
+            },
+            series: Object.entries(data.growth.series).map(([name, values]) => ({
+                name,
+                type: 'line',
+                smooth: true,
+                data: values,
+                lineStyle: { width: 3, color: name.includes('心理') ? '#8fb59b' : name.includes('科研') ? chartBlue : chartGold },
+                itemStyle: { color: name.includes('心理') ? '#8fb59b' : name.includes('科研') ? chartBlue : chartGold },
+                symbolSize: 6
+            }))
+        });
+        growthChart.off('click');
+        growthChart.on('click', params => openGrowthDetail(params.seriesName));
+
+        document.getElementById('currentTypeHead').innerText = `${p.student_type}均值`;
+        document.getElementById('adjacentTypeHead').innerText = `${p.adjacent_type}均值`;
+        document.getElementById('typeCompareTable').innerHTML = data.type_compare.map(item => `
+            <tr>
+                <td>${item.label}</td>
+                <td>${item.mine}</td>
+                <td>${item.current_type_avg}</td>
+                <td>${item.adjacent_type_avg}</td>
+            </tr>
+        `).join('');
+
+        const strengths = getStrengthItems();
+        const concerns = getConcernItems();
+        document.getElementById('issueSummary').innerHTML = `
+            <div class="mini-title">学生定位与发展判断</div>
+            <div class="text">${buildEncouragementText()}</div>
+            <div class="text" style="margin-top:8px;">当前系统判断其主要发展类型为“${p.student_type}”，建议从已有优势出发，再逐步处理当前最需要关注的方面。</div>
+        `;
+
+        document.getElementById('highlightList').innerHTML = [
+            `<div class="highlight-card"><div class="mini-title">当前优势与潜力</div><div class="text">${strengths.length ? `当前更突出的维度主要包括：${strengths.slice(0, 3).join('、')}。这些维度可作为后续深度发展、科研连接或挑战性任务配置的基础。` : '当前暂未出现特别突出的单项优势，但整体仍有进一步培育和拉升的空间。'}</div></div>`,
+            `<div class="highlight-card"><div class="mini-title">当前关注点</div><div class="text">${concerns.length ? `当前更值得优先关注的是：${concerns.slice(0, 3).join('、')}。这里的“关注”不等于否定，而是提示后续支持可以从这些地方切入。` : '当前没有特别突出的高风险项，更适合维持稳定节奏并逐步寻找突破点。'}</div></div>`
+        ].join('');
+
+        document.getElementById('riskList').innerHTML = data.issues.risk_tags.length
+            ? data.issues.risk_tags.map((r, idx) => `
+                <div class="risk-item" onclick="openRiskDetail(${idx})" style="cursor:pointer;">
+                    <div class="top">
+                        <strong>${r.label}</strong>
+                        <span class="tag ${levelClass(r.severity)}">${riskTitle(r.severity)}</span>
+                    </div>
+                    <div class="text">${r.description || ''}</div>
+                </div>
+            `).join('')
+            : '<div class="risk-item"><div class="text">当前未命中明显风险标签，建议以优势深化和节奏保持为主。</div></div>';
+
+        document.getElementById('dimensionList').innerHTML = data.dimensions.map(d => `
+            <div class="summary-card" onclick="openDimensionDetail('${d.label}')" style="cursor:pointer;">
+                <div class="dim-row"><strong>${d.label}</strong><span>${d.score}分 / P${d.percentile}</span></div>
+                <div class="bar"><span style="width:${d.score}%"></span></div>
+                <div class="text" style="margin-top:8px;">${d.zone} ｜ Z分数 ${d.z_score}</div>
+            </div>
+        `).join('');
+
+        const adviceIntro = (p.warning_level === 'none' || p.warning_level === 'green')
+            ? '该生当前更适合采用“少而精”的发展型建议，避免过度干预，把重点放在优势深化、资源连接和挑战性机会配置上。'
+            : '该生当前更适合采用“先稳住、再提升”的支持型建议，先肯定已有努力，再给出低门槛、可执行的下一步动作。';
+        document.getElementById('adviceList').innerHTML = [
+            ['建议使用原则', adviceIntro],
+            ['学术发展建议', data.advice.academic],
+            ['心理支持建议', data.advice.psychology],
+            ['能力提升建议', data.advice.skill],
+            ['资源利用建议', data.advice.resource],
+            ['综合行动路径', data.advice.path],
+            ['对标路径', data.advice.benchmark_case],
+        ].map(([title, text]) => `
+            <div class="advice-card" onclick="openAdviceDetail('${title}', '${String(text).replace(/'/g, "\\'")}')" style="cursor:pointer;">
+                <div class="mini-title">${title}</div>
+                <div class="text">${text}</div>
+            </div>
+        `).join('');
+
+        document.getElementById('resourceList').innerHTML = [
+            ['复旦讲座与活动', '可结合院系通知、复旦活动平台、相辉学堂讲座安排，帮助学生建立更真实的学术接触场景。', 'https://www.fudan.edu.cn'],
+            ['P/NP 制度说明', '适合用于解释课程弹性、压力调节与制度支持边界，也可作为个体建议中的制度资源入口。', 'https://jwc.fudan.edu.cn'],
+            ['FDUROP / 科研机会', '适合为科研参与不足或需要进一步拓展的学生提供更明确的项目入口。', 'https://jwc.fudan.edu.cn'],
+            ['心理与学生支持', '适合为压力较大、心理健康维度偏低的学生提供正式支持资源。', 'https://www.fudan.edu.cn'],
+        ].map(([title, text, link]) => `
+            <div class="resource-card">
+                <div class="mini-title">${title}</div>
+                <div class="text">${text}</div>
+                <div style="margin-top:8px;"><a href="${link}" target="_blank" rel="noopener noreferrer">打开链接</a></div>
+            </div>
+        `).join('');
+
+        document.getElementById('rawSignals').innerHTML = Object.entries(data.raw_signals).map(([k, v]) => `
+            <div class="signal-card">
+                <div class="key">${k}</div>
+                <div class="value">${v}</div>
+            </div>
+        `).join('');
+
+        const ro = new ResizeObserver(() => {
+            radarChart && radarChart.resize();
+            growthChart && growthChart.resize();
+            detailChart && detailChart.resize();
+        });
+        ro.observe(document.body);
+    } catch (e) {
+        console.error(e);
+        showErrorBanner('正式版个人画像接口连接失败，请确认后端服务已启动（端口 8002）。');
+    }
+}
+init();
+</script>
+</body>
+</html>

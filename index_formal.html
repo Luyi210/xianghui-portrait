@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>相辉学堂人物画像系统 - 群体分析驾驶舱</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+        html, body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            background-color: #f7f1ea !important;
+        }
+        @media print {
+            html, body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                background: #f7f1ea !important;
+            }
+            body {
+                min-height: auto !important;
+            }
+            .assistant-fab,
+            .assistant-panel,
+            .overlay {
+                display: none !important;
+            }
+            .page {
+                max-width: none !important;
+                padding: 8mm !important;
+            }
+            .header,
+            .panel,
+            .kpi,
+            .summary-item,
+            .student-card,
+            .mini-metric {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+        :root {
+            --bg: #f7f1ea;
+            --panel: rgba(255,251,246,0.84);
+            --panel-strong: rgba(255,248,240,0.90);
+            --line: rgba(122,31,53,0.12);
+            --gold: #c79a62;
+            --blue: #93abc8;
+            --paper: #f7f1e8;
+            --text: #4f3d34;
+            --muted: #74685f;
+            --red: #e98c8c;
+            --yellow: #edc276;
+            --green: #8ec5a5;
+            --maroon: #7a1f35;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: "PingFang SC", "Noto Serif SC", sans-serif;
+            color: var(--text);
+            background:
+                linear-gradient(rgba(255,249,242,0.40), rgba(255,249,242,0.56)),
+                radial-gradient(circle at 12% 14%, rgba(122,31,53,0.06), transparent 24%),
+                radial-gradient(circle at 84% 10%, rgba(216,179,122,0.10), transparent 18%),
+                url('1.jpeg') center top / cover no-repeat fixed,
+                linear-gradient(180deg, #fbf7f2 0%, #efe5da 100%);
+        }
+        .page {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 18px 18px 26px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            border-radius: 18px;
+            background: linear-gradient(rgba(255,255,255,0.84), rgba(250,244,237,0.88));
+            border: 1px solid var(--line);
+            border-top: 1px solid rgba(199,154,98,0.24);
+            box-shadow: 0 18px 34px rgba(110,78,52,0.10);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+        .header h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 1px; }
+        .header p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+        .header::before {
+            content: '相辉学堂学术档案 / XIANGHUI DOSSIER';
+            position: absolute;
+            right: 18px;
+            top: 12px;
+            font-size: 11px;
+            letter-spacing: 1.6px;
+            color: rgba(79,61,52,0.30);
+        }
+        .header .badge {
+            color: var(--gold);
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        .header-side { color: var(--muted); font-size: 13px; text-align: right; }
+        .status-bar {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid var(--line);
+        }
+        .status-left { display:flex; gap:8px; flex-wrap:wrap; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--gold);
+            background: rgba(122,31,53,0.08);
+            border: 1px solid rgba(199,154,98,0.22);
+        }
+        .btn {
+            background: rgba(255,255,255,0.76);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+        .btn:hover { border-color: rgba(199,154,98,0.44); background: linear-gradient(135deg, rgba(255,251,245,0.94), rgba(246,232,209,0.82)); transform: translateY(-1px); }
+        .grade-btn.active {
+            color: #08162d;
+            background: linear-gradient(135deg, #c79a62, #ecd1a7);
+            border-color: rgba(199,154,98,0.85);
+            font-weight: 700;
+        }
+        .kpis {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .kpi {
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(rgba(255,255,255,0.82), rgba(250,244,237,0.88));
+            border: 1px solid var(--line);
+            box-shadow: 0 12px 24px rgba(110,78,52,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi .label { color: var(--muted); font-size: 11px; }
+        .kpi .value { margin-top: 8px; color: var(--gold); font-size: 24px; font-weight: 700; }
+        .main {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+            gap: 16px;
+            align-items: start;
+        }
+        .panel {
+            background: linear-gradient(rgba(255,255,255,0.82), rgba(250,244,237,0.88));
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 16px 30px rgba(110,78,52,0.09);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+        .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .panel-title h3 { margin: 0; font-size: 16px; color: var(--gold); }
+        .desc { color: var(--muted); font-size: 12px; }
+        .chart-lg { width: 100%; height: 360px; }
+        .row-2 {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .chart-md { width: 100%; height: 260px; }
+        .summary-list { display: grid; gap: 10px; }
+        .summary-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.70);
+            border: 1px solid var(--line);
+        }
+        .summary-item .t { font-weight: 700; margin-bottom: 6px; }
+        .summary-item .c { color: var(--muted); line-height: 1.7; font-size: 13px; }
+        .insight-mix {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 14px;
+        }
+        .mini-metric-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .mini-metric {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.70);
+            border: 1px solid var(--line);
+        }
+        .mini-metric .k { color: var(--muted); font-size: 12px; }
+        .mini-metric .v { margin-top: 6px; color: var(--gold); font-size: 22px; font-weight: 700; }
+        .mini-metric .d { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+        .side-stack { display: grid; gap: 14px; }
+        .student-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .directory-panel { margin-top: 14px; }
+        .directory-toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 220px;
+            background: rgba(255,255,255,0.82);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 9px 12px;
+            outline: none;
+        }
+        .directory-list {
+            max-height: 340px;
+            overflow: auto;
+            border-top: 1px solid var(--line);
+        }
+        .directory-row {
+            display: grid;
+            grid-template-columns: 96px minmax(180px, 1fr) 76px 100px 96px 112px;
+            gap: 12px;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--line);
+            align-items: center;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .directory-row:hover { background: rgba(255,248,240,0.82); }
+        .directory-head {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: default;
+        }
+        .student-card {
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--line);
+            cursor: pointer;
+        }
+        .student-card:hover { border-color: rgba(216,179,122,0.45); }
+        .student-card .name { font-weight: 700; }
+        .student-card .meta { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+        .tag {
+            display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
+        }
+        .red { background: rgba(248,113,113,0.18); color: var(--red); }
+        .yellow { background: rgba(251,191,36,0.18); color: var(--yellow); }
+        .green { background: rgba(74,222,128,0.18); color: var(--green); }
+        .none { background: rgba(125,183,255,0.16); color: var(--blue); }
+        table { width:100%; border-collapse:collapse; font-size:13px; }
+        th, td { padding:9px 6px; border-bottom:1px solid var(--line); text-align:left; }
+        th { color: var(--muted); font-weight: 500; }
+        .assistant-fab {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 1px solid rgba(216,179,122,0.38);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.62), transparent 35%), linear-gradient(135deg, #c99b5a, #e7c790 62%, #f4e3c3);
+            color: #fff;
+            box-shadow: 0 16px 28px rgba(188,148,91,0.26);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 30;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2;
+            font-size: 12px;
+        }
+        .assistant-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 98px;
+            width: 360px;
+            height: 520px;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248,241,234,0.96));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 24px 48px rgba(110,78,52,0.16);
+            overflow: hidden;
+            z-index: 31;
+        }
+        .assistant-panel.show { display: flex; }
+        .assistant-head { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+        .assistant-quick { padding: 10px 12px; border-bottom: 1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; }
+        .quick-chip { padding: 6px 10px; border-radius: 999px; background: rgba(216,179,122,0.12); border: 1px solid rgba(216,179,122,0.25); color: var(--gold); font-size: 12px; cursor: pointer; }
+        .assistant-body { flex: 1; overflow: auto; padding: 14px; display: grid; gap: 10px; }
+        .assistant-msg { padding: 10px 12px; border-radius: 12px; line-height: 1.7; font-size: 13px; max-width: 92%; }
+        .assistant-msg.ai { background: rgba(255,255,255,0.78); color: var(--text); }
+        .assistant-msg.user { background: rgba(216,179,122,0.20); color: var(--text); justify-self: end; }
+        .assistant-foot { padding: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+        .assistant-input { background: rgba(255,255,255,0.88); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+        .overlay {
+            position: fixed; inset: 0; background: rgba(112,92,69,0.20); display:none; align-items:center; justify-content:center; z-index:20; backdrop-filter: blur(6px);
+        }
+        .overlay.show { display:flex; }
+        .modal, .detail-modal {
+            background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,241,234,0.98)); border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:0 24px 60px rgba(110,78,52,0.18);
+        }
+        .modal { width:min(1180px,92vw); height:min(760px,90vh); display:grid; grid-template-rows:56px 1fr; }
+        .detail-modal { width:min(980px,86vw); height:min(680px,82vh); display:grid; grid-template-rows:56px 1fr; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; padding:0 18px; border-bottom:1px solid var(--line); }
+        .modal-body { height:100%; }
+        .modal-body iframe { width:100%; height:100%; border:0; background:#fffaf4; }
+        @media (max-width: 1200px) {
+            .page { padding: 14px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header-side { text-align: left; width: 100%; }
+            .main, .row-2, .insight-mix { grid-template-columns: 1fr; }
+            .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .student-grid { grid-template-columns: 1fr; }
+            .chart-lg { height: 320px; }
+            .chart-md { height: 240px; }
+        }
+        @media (max-width: 860px) {
+            .page { padding: 12px; }
+            .brand-banner { grid-template-columns: 1fr; }
+            .header h1 { font-size: 26px; }
+            .status-bar { flex-direction: column; align-items: flex-start; }
+            .status-left { width: 100%; }
+            .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .panel { padding: 14px; }
+            .chart-lg { height: 280px; }
+            .chart-md { height: 220px; }
+        }
+        @media (max-width: 560px) {
+            .kpis { grid-template-columns: 1fr; }
+            .header { padding: 16px; }
+            .header h1 { font-size: 22px; }
+            .btn { width: 100%; justify-content: center; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .page > * { animation: fadeInUp .45s ease both; }
+        .page > *:nth-child(2) { animation-delay: .05s; }
+        .page > *:nth-child(3) { animation-delay: .10s; }
+        .page > *:nth-child(4) { animation-delay: .15s; }
+        .page > *:nth-child(5) { animation-delay: .20s; }
+        @keyframes countUp {
+            from { opacity: 0.3; transform: translateY(6px); }
+            to   { opacity: 1;   transform: translateY(0); }
+        }
+        .kpi .value.animating { animation: countUp .5s ease; }
+        .kpi-skeleton .value {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+            height: 36px;
+            width: 70%;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .assistant-fab {
+            animation: fabPulse 2.8s ease-in-out infinite;
+        }
+        @keyframes fabPulse {
+            0%, 100% { box-shadow: 0 16px 28px rgba(188,148,91,0.26), 0 0 0 0 rgba(216,179,122,0.18); }
+            50%       { box-shadow: 0 16px 28px rgba(188,148,91,0.26), 0 0 0 8px rgba(216,179,122,0); }
+        }
+        .directory-head .sort-arrow { font-size: 10px; margin-left: 4px; opacity: 0.5; }
+        .directory-head .sort-arrow.active { opacity: 1; color: var(--gold); }
+        .directory-head > div { cursor: pointer; user-select: none; }
+        .directory-head > div:hover { color: var(--gold); }
+        .dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+        .dot.red    { background: var(--red); box-shadow: 0 0 4px var(--red); }
+        .dot.yellow { background: var(--yellow); box-shadow: 0 0 4px var(--yellow); }
+        .dot.green  { background: var(--green); box-shadow: 0 0 4px var(--green); }
+        .dot.none   { background: var(--blue); }
+        .search-wrap { position: relative; flex: 1; min-width: 220px; }
+        .search-wrap .search-input { width: 100%; }
+        .search-clear {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--muted); cursor: pointer;
+            font-size: 16px; padding: 2px 4px; display: none;
+        }
+        .search-clear:hover { color: var(--text); }
+        .scroll-top {
+            position: fixed; left: 24px; bottom: 24px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,251,246,0.88); border: 1px solid rgba(216,179,122,0.3);
+            color: var(--gold); cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; opacity: 0;
+            transition: opacity .3s, transform .3s;
+            z-index: 29; pointer-events: none;
+        }
+        .scroll-top.visible { opacity: 1; pointer-events: auto; }
+        .scroll-top:hover { transform: translateY(-2px); background: rgba(246,232,209,0.92); }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="brand-banner">
+        <div class="brand-hero">
+            <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+            <div class="brand-title">拔尖创新人才培养画像 · 第三阶段可视化推进</div>
+            <div class="brand-copy">本轮继续补公开项目级对标数据，同时把首页氛围从“深蓝驾驶舱”往“复旦专题页 / 学术档案页 / 书院展示页”推进：绛红为主强调，纸张米白做衬底，保留深色但不让它压过复旦气质。</div>
+        </div>
+        <div class="brand-nav">
+            <div class="brand-kicker">PHASE 3 EXECUTION</div>
+            <div class="brand-copy">当前页面继续承担群体画像、重点学生入口、制度导航与校际对标总入口；对标页现已新增更多具体项目页面链接。</div>
+            <div class="brand-link-row">
+                <a class="brand-link" href="resources_fudan.html" target="_blank">复旦资源导航</a>
+                <a class="brand-link" href="policy_overview.html" target="_blank">政策概要</a>
+                <a class="brand-link" href="benchmark_overview.html" target="_blank">高校对标</a>
+                <a class="brand-link" href="data_methodology.html" target="_blank">数据方法</a>
+                <a class="brand-link" href="phase3_progress.md" target="_blank">阶段文档</a>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <div>
+            <h1>相辉学堂人物画像系统</h1>
+            <p>复旦大学 · 相辉学堂 · 学生画像与群体分析展示页</p>
+            <div class="badge">GUANGHUA TOWERS · XIANGHUI HALL · STUDENT PORTRAITS</div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;" id="gradeTabs">
+                <button class="btn grade-btn active" data-grade="" onclick="switchGrade('')">全部</button>
+                <button class="btn grade-btn" data-grade="1" onclick="switchGrade('1')">大一</button>
+                <button class="btn grade-btn" data-grade="2" onclick="switchGrade('2')">大二</button>
+                <button class="btn grade-btn" data-grade="3" onclick="switchGrade('3')">大三</button>
+                <button class="btn grade-btn" data-grade="4" onclick="switchGrade('4')">大四</button>
+            </div>
+            <div class="status-bar">
+                <div class="status-left" id="filterStatus"></div>
+                <button class="btn" onclick="clearFilters()">清空筛选</button>
+            </div>
+        </div>
+        <div class="header-side">
+            <div>FUDAN UNIVERSITY</div>
+            <div>数据源：formal_student_data.csv</div>
+            <div>接口：/api/formal</div>
+            <div style="margin-top:10px; display:grid; gap:8px; justify-items:end;">
+                <a class="btn" href="resources_fudan.html" target="_blank">复旦资源导航</a>
+                <a class="btn" href="policy_overview.html" target="_blank">管理者政策概要</a>
+                <a class="btn" href="benchmark_overview.html" target="_blank">高校对标总览</a>
+                <a class="btn" href="benchmark_compare.html" target="_blank">多校比较</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="main">
+        <div>
+            <div class="panel">
+                <div class="panel-title">
+                    <div>
+                        <h3>群体核心维度概览</h3>
+                        <div class="desc">群体主图</div>
+                    </div>
+                </div>
+                <div id="dimensionChart" class="chart-lg"></div>
+            </div>
+
+            <div class="row-2">
+                <div class="panel">
+                    <div class="panel-title">
+                        <h3>学生类型分布</h3>
+                        <div class="desc">相辉学生分型</div>
+                    </div>
+                    <div id="typeChart" class="chart-md"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">
+                        <h3>预警等级分布</h3>
+                        <div class="desc">学生支持热度</div>
+                    </div>
+                    <div id="warningChart" class="chart-md"></div>
+                </div>
+            </div>
+
+            <div class="insight-mix">
+                <div class="panel">
+                    <div class="panel-title">
+                        <h3>关键发现</h3>
+                        <div class="desc">展示页结论区</div>
+                    </div>
+                    <div class="summary-list" id="leftInsights"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">
+                        <h3>制度与支持</h3>
+                        <div class="desc">制度支持指标</div>
+                    </div>
+                    <div class="mini-metric-grid" id="miniMetrics"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-stack">
+            <div class="panel">
+                <div class="panel-title">
+                    <h3>复旦画像摘要</h3>
+                    <div class="desc">自动摘要</div>
+                </div>
+                <div class="summary-list" id="findings"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <div>
+                        <h3>重点学生入口</h3>
+                        <div class="desc">点击卡片进入画像小窗</div>
+                    </div>
+                    <button class="btn" onclick="loadStudents()">刷新</button>
+                </div>
+                <div class="student-grid" id="studentGrid"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <div>
+                        <h3>分组对比</h3>
+                        <div class="desc">点击行看图表详情</div>
+                    </div>
+                    <select id="groupBy" class="btn" onchange="loadGroupCompare()">
+                        <option value="admission_type">按入学方式</option>
+                        <option value="major_track">按学科方向</option>
+                        <option value="source_region_type">按生源地类型</option>
+                        <option value="warning_level">按预警等级</option>
+                        <option value="student_type">按学生类型</option>
+                    </select>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>分组</th>
+                            <th>人数</th>
+                            <th>志趣</th>
+                            <th>科研</th>
+                            <th>心理</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel directory-panel">
+        <div class="panel-title">
+            <div>
+                <h3>全部学生名录</h3>
+                <div class="desc">支持搜索 1~200 位学生，并点击进入画像页</div>
+            </div>
+            <div class="desc" id="directoryCount">共 0 人</div>
+        </div>
+        <div class="directory-toolbar">
+            <div class="search-wrap">
+                <input id="studentSearch" class="search-input" placeholder="搜索学号 / 姓名 / 专业 / 省份 / 类型" oninput="onSearchInput()" />
+                <button class="search-clear" id="searchClear" onclick="clearSearch()" title="清空搜索">×</button>
+            </div>
+            <button class="btn" onclick="loadAllStudents()">刷新全部学生</button>
+        </div>
+        <div class="directory-list" id="directoryList"></div>
+    </div>
+</div>
+
+<div class="assistant-fab" onclick="toggleAssistant()">相辉<br>小助手</div>
+<div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-head">
+        <div style="font-weight:700; color:var(--gold);">相辉小助手</div>
+        <div class="desc">已接入 DeepSeek，可结合 200 名学生数据回答</div>
+    </div>
+    <div class="assistant-quick">
+        <div class="quick-chip" onclick="quickAsk('这200名学生最明显的整体特征是什么？','overview')">整体特征</div>
+        <div class="quick-chip" onclick="quickAsk('哪类学生最需要重点关注？','overview')">重点关注</div>
+        <div class="quick-chip" onclick="quickAsk('请总结当前群体的主要风险。','overview')">主要风险</div>
+    </div>
+    <div class="assistant-body" id="assistantBody">
+        <div class="assistant-msg ai">你好，我是相辉小助手。你可以直接问我：群体里哪类学生最需要关注？某种类型有什么特点？或者让
+我总结当前 200 名学生的整体情况。</div>
+    </div>
+    <div class="assistant-foot">
+        <input id="assistantInput" class="assistant-input" placeholder="请输入你的问题..." />
+        <button class="btn" onclick="sendAssistantMessage('overview')">发送</button>
+    </div>
+</div>
+
+<div class="overlay" id="studentOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <div id="modalTitle">学生画像</div>
+            <div>
+                <button class="btn" onclick="openInFullPage()">新窗口打开</button>
+                <button class="btn" onclick="closeOverlay()">关闭</button>
+            </div>
+        </div>
+        <div class="modal-body"><iframe id="studentFrame" src="about:blank"></iframe></div>
+    </div>
+</div>
+
+<div class="overlay" id="detailOverlay">
+    <div class="detail-modal">
+        <div class="modal-header">
+            <div>
+                <div id="detailTitle">图表详情</div>
+                <div class="desc" id="detailSubtitle">点击图表后的扩展说明与明细</div>
+            </div>
+            <button class="btn" onclick="closeDetailOverlay()">关闭</button>
+        </div>
+        <div class="modal-body" style="padding:16px; display:grid; grid-template-rows:1fr auto; gap:12px;">
+            <div id="detailChart" style="width:100%; height:100%; min-height:320px;"></div>
+            <div id="detailTableWrap" style="max-height:220px; overflow:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script>
+const api = '/api/formal';
+const chartText = '#6b5d52';
+const chartLine = 'rgba(122,31,53,0.18)';
+const chartSplit = 'rgba(122,31,53,0.08)';
+const chartLegend = '#5f4a3f';
+const chartGold = '#c79a62';
+const chartBlue = '#93abc8';
+let dimensionChart, typeChart, warningChart, detailChart;
+let currentStudentUrl = '';
+let currentStudents = [];
+let currentWarnings = [];
+let allStudents = [];
+let overviewState = null;
+let activeFilters = { student_type: '', warning_level: '' };
+let activeGrade = '';
+let dirSort = { key: '', dir: 1 };
+
+// ── 工具 ──────────────────────────────────────────────────
+function levelClass(level) { return ['red','yellow','green','none'].includes(level) ? level : 'none'; }
+function fmtPct(v) { return `${Number(v).toFixed(2)}%`; }
+
+function animateCount(el, target, isFloat = false) {
+    const isPercent = String(target).includes('%');
+    const num = parseFloat(String(target).replace('%', ''));
+    const duration = 600;
+    const start = performance.now();
+    el.classList.add('animating');
+    function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        const val = num * ease;
+        el.textContent = isPercent ? `${isFloat ? val.toFixed(2) : Math.round(val)}%` : (isFloat ? val.toFixed(2) : Math.round(val));
+        if (t < 1) requestAnimationFrame(step);
+        else { el.textContent = target; el.classList.remove('animating'); }
+    }
+    requestAnimationFrame(step);
+}
+
+// ── 搜索框 ────────────────────────────────────────────────
+function onSearchInput() {
+    const val = document.getElementById('studentSearch').value;
+    document.getElementById('searchClear').style.display = val ? 'block' : 'none';
+    renderDirectory();
+}
+function clearSearch() {
+    document.getElementById('studentSearch').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    renderDirectory();
+}
+
+// ── 滚动回顶 ──────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
+});
+
+// ── Esc 关闭弹窗 ─────────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('studentOverlay').classList.contains('show')) closeOverlay();
+        else if (document.getElementById('detailOverlay').classList.contains('show')) closeDetailOverlay();
+        else if (document.getElementById('assistantPanel').classList.contains('show')) toggleAssistant();
+    }
+});
+
+function updateFilterStatus() {
+    const parts = [];
+    parts.push(`<span class="chip">年级：${activeGrade ? `大${activeGrade}` : '全部年级'}</span>`);
+    if (activeFilters.student_type) parts.push(`<span class="chip">类型：${activeFilters.student_type}</span>`);
+    if (activeFilters.warning_level) parts.push(`<span class="chip">预警：${activeFilters.warning_level}</span>`);
+    if (!activeFilters.student_type && !activeFilters.warning_level) parts.push(`<span class="chip">当前筛选：全部学生</span>`);
+    document.getElementById('filterStatus').innerHTML = parts.join('');
+    document.querySelectorAll('.grade-btn').forEach(btn => {
+        btn.classList.toggle('active', (btn.dataset.grade || '') === String(activeGrade));
+    });
+}
+async function clearFilters() {
+    activeFilters = { student_type: '', warning_level: '' };
+    updateFilterStatus();
+    await refreshOverviewPage();
+}
+async function switchGrade(grade) {
+    activeGrade = grade;
+    activeFilters = { student_type: '', warning_level: '' };
+    updateFilterStatus();
+    await refreshOverviewPage();
+}
+function buildQuery(params = {}) {
+    const q = new URLSearchParams();
+    if (activeGrade) q.set('grade', activeGrade);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') q.set(key, value);
+    });
+    return q.toString();
+}
+
+function sortArrow(key) {
+    if (dirSort.key !== key) return `<span class="sort-arrow">⇅</span>`;
+    return `<span class="sort-arrow active">${dirSort.dir === 1 ? '↑' : '↓'}</span>`;
+}
+
+function toggleSort(key) {
+    if (dirSort.key === key) dirSort.dir *= -1;
+    else { dirSort.key = key; dirSort.dir = 1; }
+    renderDirectory();
+}
+
+function renderDirectory() {
+    const keyword = (document.getElementById('studentSearch')?.value || '').trim().toLowerCase();
+    let rows = allStudents.filter(r => {
+        const text = `${r.student_id} ${r.name} ${r.major_track} ${r.source_province} ${r.student_type}`.toLowerCase();
+        return !keyword || text.includes(keyword);
+    });
+
+    if (dirSort.key) {
+        rows = [...rows].sort((a, b) => {
+            const av = a[dirSort.key], bv = b[dirSort.key];
+            return (av < bv ? -1 : av > bv ? 1 : 0) * dirSort.dir;
+        });
+    }
+
+    const warningOrder = { red: 0, yellow: 1, green: 2, none: 3 };
+    document.getElementById('directoryCount').innerText = `共 ${rows.length} 人`;
+    document.getElementById('directoryList').innerHTML = `
+        <div class="directory-row directory-head">
+            <div onclick="toggleSort('student_id')">学号${sortArrow('student_id')}</div>
+            <div onclick="toggleSort('name')">姓名 / 信息${sortArrow('name')}</div>
+            <div onclick="toggleSort('grade')">年级${sortArrow('grade')}</div>
+            <div onclick="toggleSort('major_track')">专业${sortArrow('major_track')}</div>
+            <div onclick="toggleSort('source_province')">省份${sortArrow('source_province')}</div>
+            <div onclick="toggleSort('warning_level')">类型${sortArrow('warning_level')}</div>
+        </div>
+        ${rows.map(r => `
+            <div class="directory-row" onclick="openStudent(${r.student_id}, '${String(r.name).replace(/'/g, "\\'")}')">
+                <div>${r.student_id}</div>
+                <div style="display:flex;align-items:center;gap:4px;"><span class="dot ${levelClass(r.warning_level)}"></span><div><strong>${r.name}</strong><div class="desc">${r.warning_level} · ${r.warning_count}项风险</div></div></div>
+                <div>${r.grade}</div>
+                <div>${r.major_track}</div>
+                <div>${r.source_province}</div>
+                <div>${r.student_type}</div>
+            </div>
+        `).join('')}
+    `;
+}
+
+async function loadAllStudents() {
+    const res = await axios.get(`${api}/students?${buildQuery({ limit: '200' })}`);
+    allStudents = res.data.records || [];
+    renderDirectory();
+}
+
+function buildFindings(summary, dimensions, typeDistribution, warningDistribution) {
+    const topType = Object.entries(typeDistribution).sort((a,b)=>b[1]-a[1])[0];
+    const topWarning = Object.entries(warningDistribution).sort((a,b)=>b[1]-a[1])[0];
+    const strongest = [...dimensions].sort((a,b)=>b.mean-a.mean)[0];
+    const weakest = [...dimensions].sort((a,b)=>a.mean-b.mean)[0];
+    return [
+        { title: '群体结构', text: `当前样本共 ${summary.total_students} 人，主类型为“${topType?.[0] || '--'}”，占比约 ${topType ? ((topType[1] / summary.total_students) * 100).toFixed(1) : '--'}%。` },
+        { title: '维度强弱', text: `当前均值最高维度为“${strongest.label}”（${strongest.mean}），最低为“${weakest.label}”（${weakest.mean}）。` },
+        { title: '学生支持', text: `当前数量最多的预警等级是“${topWarning?.[0] || '--'}”，心理健康均值为 ${summary.avg_mental_health}。` },
+        { title: '制度与资源', text: `导师覆盖率 ${fmtPct(summary.mentor_coverage_rate)}，科研参与率 ${fmtPct(summary.research_participation_rate)}，FDUROP 参与率 ${fmtPct(summary.fdurop_participation_rate)}。` }
+    ];
+}
+
+function renderDetailTable(rows, columns) {
+    if (!rows.length) { document.getElementById('detailTableWrap').innerHTML = '<div class="desc">暂无明细数据。</div>'; return; }
+    document.getElementById('detailTableWrap').innerHTML = `
+        <table><thead><tr>${columns.map(c => `<th>${c.label}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(row => `<tr>${columns.map(c => `<td>${row[c.key] ?? ''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+function openDetailOverlay(title, subtitle='点击图表后的扩展说明与明细') {
+    document.getElementById('detailTitle').innerText = title;
+    document.getElementById('detailSubtitle').innerText = subtitle;
+    document.getElementById('detailOverlay').classList.add('show');
+    if (!detailChart) detailChart = echarts.init(document.getElementById('detailChart'));
+    setTimeout(() => detailChart.resize(), 60);
+}
+function closeDetailOverlay() { document.getElementById('detailOverlay').classList.remove('show'); detailChart && detailChart.clear(); document.getElementById('detailTableWrap').innerHTML = ''; }
+
+async function loadOverview() {
+    const res = await axios.get(`${api}/overview?${buildQuery()}`);
+    const data = res.data;
+    overviewState = data;
+    const s = data.summary;
+    const gradeLabel = activeGrade ? `大${activeGrade}` : '全体';
+    const kpiData = [
+        [`${gradeLabel}学生数`, s.total_students],
+        ['导师覆盖率', `${s.mentor_coverage_rate}%`],
+        ['科研参与率', `${s.research_participation_rate}%`],
+        ['FDUROP参与率', `${s.fdurop_participation_rate}%`],
+        ['P/NP使用率', `${s.pnp_usage_rate}%`],
+        ['心理健康均值', s.avg_mental_health],
+    ];
+    document.getElementById('kpis').innerHTML = kpiData
+        .map(([label, value]) => `<div class="kpi"><div class="label">${label}</div><div class="value" data-target="${value}">--</div></div>`)
+        .join('');
+    document.querySelectorAll('.kpi .value[data-target]').forEach(el => {
+        animateCount(el, el.dataset.target, String(el.dataset.target).includes('.'));
+    });
+
+    const findingsHtml = buildFindings(s, data.dimensions, data.type_distribution, data.warning_distribution)
+        .map(f => `<div class="summary-item"><div class="t">${f.title}</div><div class="c">${f.text}</div></div>`).join('');
+    document.getElementById('findings').innerHTML = findingsHtml;
+    document.getElementById('leftInsights').innerHTML = [
+        `<div class="summary-item"><div class="t">当前主结论</div><div class="c">${activeGrade ? `当前聚焦大${activeGrade}学生，` : '当前系统整体'}呈现出较明显的类型分层，学生支持工作应优先关注心理健康与科研参与的结构性差异。</div></div>`,
+        `<div class="summary-item"><div class="t">面向培养的提示</div><div class="c">${activeGrade ? `大${activeGrade}阶段更适合结合年级发展任务，` : ''}把导师支持、制度使用和成长跟踪结合起来，而不是只盯单次成绩表现。</div></div>`,
+        `<div class="summary-item"><div class="t">页面使用建议</div><div class="c">先切换年级，再看主图和类型分布，最后从全部学生名录进入个人画像，会更顺手。</div></div>`
+    ].join('');
+    document.getElementById('miniMetrics').innerHTML = [
+        ['导师覆盖率', `${s.mentor_coverage_rate}%`, '导学关系是正式版里最值得持续追踪的支持变量之一。'],
+        ['FDUROP参与率', `${s.fdurop_participation_rate}%`, '科研参与与制度机会之间的连接还可以继续加强。'],
+        ['P/NP使用率', `${s.pnp_usage_rate}%`, '制度使用情况可作为后续解释压力与探索空间的重要信号。']
+    ].map(([k, v, d]) => `<div class="mini-metric"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+
+    dimensionChart = echarts.init(document.getElementById('dimensionChart'));
+    dimensionChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: 42, right: 24, top: 30, bottom: 54 },
+        xAxis: { type: 'category', data: data.dimensions.map(i => i.label), axisLabel: { color: chartText, interval: 0, rotate: 22 }, axisLine: { lineStyle: { color: chartLine } } },
+        yAxis: { type: 'value', min: 0, max: 100, axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+        series: [{ type: 'bar', barWidth: 34, data: data.dimensions.map(i => ({ value: i.mean, name: i.label, std: i.std })), itemStyle: { color: chartGold, borderRadius: [8,8,0,0] } }]
+    });
+    dimensionChart.off('click');
+    dimensionChart.on('click', p => {
+        openDetailOverlay(`维度详情：${p.name}`, '群体均值与离散度');
+        detailChart.setOption({
+            grid: { left: 40, right: 20, top: 30, bottom: 30 },
+            xAxis: { type: 'category', data: ['群体均值', '标准差'], axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } },
+            yAxis: { type: 'value', axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+            series: [{ type: 'bar', data: [p.data.value, p.data.std], itemStyle: { color: chartGold, borderRadius: [8,8,0,0] } }]
+        });
+        renderDetailTable(overviewState.dimensions, [
+            { key: 'label', label: '维度' }, { key: 'mean', label: '均值' }, { key: 'std', label: '标准差' }
+        ]);
+    });
+
+    typeChart = echarts.init(document.getElementById('typeChart'));
+    typeChart.setOption({
+        tooltip: { trigger: 'item' },
+        series: [{ type: 'pie', radius: ['42%', '72%'], center: ['50%', '52%'], data: Object.entries(data.type_distribution).map(([name, value]) => ({ name, value })), label: { color: chartLegend, fontSize: 12 }, itemStyle: { borderColor: 'rgba(255,251,246,0.92)', borderWidth: 2 } }]
+    });
+    typeChart.off('click');
+    typeChart.on('click', async p => {
+        activeFilters.student_type = p.name; activeFilters.warning_level = ''; await loadStudents();
+        openDetailOverlay(`类型详情：${p.name}`, '点击图表后联动学生入口');
+        detailChart.setOption({ grid: { left: 40, right: 20, top: 30, bottom: 30 }, xAxis: { type: 'category', data: ['人数'], axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } }, yAxis: { type: 'value', axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } }, series: [{ type: 'bar', data: [p.value], itemStyle: { color: chartGold, borderRadius: [8,8,0,0] } }] });
+        renderDetailTable(currentStudents, [{ key: 'name', label: '姓名' }, { key: 'grade', label: '年级' }, { key: 'major_track', label: '方向' }, { key: 'warning_level', label: '预警' }]);
+    });
+
+    const colors = { red: '#d8897b', yellow: '#d6b166', green: '#8fb59b', none: chartBlue };
+    warningChart = echarts.init(document.getElementById('warningChart'));
+    warningChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: 34, right: 16, top: 20, bottom: 30 },
+        xAxis: { type: 'category', data: Object.keys(data.warning_distribution), axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } },
+        yAxis: { type: 'value', axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } },
+        series: [{ type: 'bar', barWidth: 36, data: Object.entries(data.warning_distribution).map(([name, value]) => ({ name, value, itemStyle: { color: colors[name] || chartBlue, borderRadius: [8,8,0,0] } })) }]
+    });
+    warningChart.off('click');
+    warningChart.on('click', async p => {
+        activeFilters.warning_level = p.name; activeFilters.student_type = ''; await loadStudents();
+        openDetailOverlay(`预警详情：${p.name}`, '点击图表后联动学生入口');
+        detailChart.setOption({ grid: { left: 40, right: 20, top: 30, bottom: 30 }, xAxis: { type: 'category', data: ['人数'], axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartLine } } }, yAxis: { type: 'value', axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } }, series: [{ type: 'bar', data: [p.value], itemStyle: { color: colors[p.name] || chartBlue, borderRadius: [8,8,0,0] } }] });
+        renderDetailTable(currentWarnings.filter(r => r.warning_level === p.name), [{ key: 'name', label: '姓名' }, { key: 'grade', label: '年级' }, { key: 'major_track', label: '方向' }, { key: 'student_type', label: '类型' }]);
+    });
+}
+
+async function loadWarnings() {
+    const res = await axios.get(`${api}/warnings?${buildQuery({ limit: '20' })}`);
+    currentWarnings = res.data.records || [];
+}
+async function loadStudents() {
+    const res = await axios.get(`${api}/students?${buildQuery({
+        limit: '8',
+        student_type: activeFilters.student_type,
+        warning_level: activeFilters.warning_level,
+    })}`);
+    currentStudents = res.data.records || [];
+    updateFilterStatus();
+    document.getElementById('studentGrid').innerHTML = currentStudents.map(r => `
+        <div class="student-card" onclick="openStudent(${r.student_id}, '${r.name.replace(/'/g, "\\'")}')">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div class="name">${r.name}</div><span class="tag ${levelClass(r.warning_level)}">${r.warning_level}</span></div>
+            <div class="meta">${r.grade}年级 · ${r.major_track}<br>${r.student_type} · ${r.source_province}</div>
+        </div>`).join('');
+}
+async function loadGroupCompare() {
+    const groupBy = document.getElementById('groupBy').value;
+    const res = await axios.get(`${api}/group_compare?${buildQuery({ group_by: groupBy })}`);
+    const rows = res.data.records || [];
+    document.getElementById('groupTable').innerHTML = rows.map(r => `<tr onclick="showGroupDetail('${groupBy}', '${String(r.group).replace(/'/g, "\\'")}')" style="cursor:pointer;"><td>${r.group}</td><td>${r.count}</td><td>${r.avg_academic_interest}</td><td>${r.avg_research_engagement}</td><td>${r.avg_mental_health}</td></tr>`).join('');
+}
+async function showGroupDetail(groupBy, groupName) {
+    const res = await axios.get(`${api}/group_compare?${buildQuery({ group_by: groupBy })}`);
+    const rows = res.data.records || [];
+    openDetailOverlay(`分组详情：${groupName}`, `${activeGrade ? `大${activeGrade}` : '全体'}学生之间的核心维度比较`);
+    detailChart.setOption({ tooltip: { trigger: 'axis' }, legend: { data: ['学术志趣', '科研参与', '心理健康'], textStyle: { color: chartLegend }, top: 0 }, grid: { left: 40, right: 20, top: 40, bottom: 40 }, xAxis: { type: 'category', data: rows.map(r => r.group), axisLabel: { color: chartText, interval: 0, rotate: 16 }, axisLine: { lineStyle: { color: chartLine } } }, yAxis: { type: 'value', axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartSplit } } }, series: [{ name: '学术志趣', type: 'bar', data: rows.map(r => r.avg_academic_interest), itemStyle: { color: chartGold } }, { name: '科研参与', type: 'bar', data: rows.map(r => r.avg_research_engagement), itemStyle: { color: '#d8b98a' } }, { name: '心理健康', type: 'bar', data: rows.map(r => r.avg_mental_health), itemStyle: { color: chartBlue } }] });
+    renderDetailTable(rows, [{ key: 'group', label: '分组' }, { key: 'count', label: '人数' }, { key: 'avg_academic_interest', label: '志趣' }, { key: 'avg_research_engagement', label: '科研' }, { key: 'avg_mental_health', label: '心理' }]);
+}
+async function refreshOverviewPage() {
+    await Promise.all([
+        loadOverview(),
+        loadWarnings(),
+        loadStudents(),
+        loadAllStudents(),
+        loadGroupCompare(),
+    ]);
+}
+function openStudent(id, name) { const url = `student_formal.html?id=${id}`; window.open(url, '_blank'); }
+function closeOverlay() { document.getElementById('studentOverlay').classList.remove('show'); document.getElementById('studentFrame').src = 'about:blank'; }
+function openInFullPage() { if (currentStudentUrl) window.open(currentStudentUrl, '_blank'); }
+function toggleAssistant() { document.getElementById('assistantPanel').classList.toggle('show'); }
+function quickAsk(text, page) { document.getElementById('assistantInput').value = text; sendAssistantMessage(page); }
+
+async function sendAssistantMessage(page) {
+    const input = document.getElementById('assistantInput');
+    const body = document.getElementById('assistantBody');
+    const q = input.value.trim();
+    if (!q) return;
+    body.innerHTML += `<div class="assistant-msg user">${q}</div>`;
+    input.value = '';
+    body.innerHTML += `<div class="assistant-msg ai" id="assistantLoading">相辉小助手正在思考...</div>`;
+    body.scrollTop = body.scrollHeight;
+    try {
+        const res = await axios.post(`${api}/ai_chat`, { question: q, page });
+        const loading = document.getElementById('assistantLoading');
+        if (loading) loading.remove();
+        body.innerHTML += `<div class="assistant-msg ai">${res.data.answer}</div>`;
+    } catch (e) {
+        const loading = document.getElementById('assistantLoading');
+        if (loading) loading.remove();
+        body.innerHTML += `<div class="assistant-msg ai">相辉小助手暂时连接失败，请稍后再试。</div>`;
+    }
+    body.scrollTop = body.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('assistantInput');
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') sendAssistantMessage('overview'); });
+});
+
+async function init() {
+    updateFilterStatus();
+    await refreshOverviewPage();
+    const ro = new ResizeObserver(() => {
+        dimensionChart && dimensionChart.resize();
+        typeChart && typeChart.resize();
+        warningChart && warningChart.resize();
+        detailChart && detailChart.resize();
+    });
+    ro.observe(document.body);
+}
+init();
+</script>
+</body>
+</html>

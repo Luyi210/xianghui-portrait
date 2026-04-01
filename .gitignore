@@ -1,0 +1,6 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+backend_formal.pid
+backend_formal_stdout.log

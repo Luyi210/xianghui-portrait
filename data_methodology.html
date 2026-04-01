@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数据来源与比较方法说明</title>
+  <link rel="stylesheet" href="assets/brand/fudan_brand.css" />
+  <link rel="stylesheet" href="assets/css/benchmark.css" />
+</head>
+<body>
+<div class="page">
+  <div class="brand-banner">
+    <div class="brand-hero">
+      <div class="brand-kicker">FUDAN UNIVERSITY · XIANGHUI HALL</div>
+      <div class="brand-title">数据来源与方法说明</div>
+      <div class="brand-copy">本页说明对标数据从哪里来、边界是什么、怎样比较、哪些内容暂不覆盖。核心原则是：只展示公开项目级信息，不涉及任何私人学生数据。</div>
+    </div>
+    <div class="brand-nav">
+      <div class="brand-kicker">DATA METHODOLOGY</div>
+      <div class="brand-copy">这页是平台可信度的一部分：让使用者清楚“页面里看到的是什么，也知道它不是什么”。</div>
+      <div class="brand-link-row">
+        <a class="brand-link" href="benchmark_overview.html">对标总览</a>
+        <a class="brand-link" href="benchmark_compare.html">多校比较</a>
+        <a class="brand-link" href="policy_overview.html">管理者视角</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <h1>数据来源与方法说明</h1>
+      <p>当前原型强调“先跑起来、可本地打开、可解释”，因此对标页优先使用本地 CSV 与内嵌 JS 数据对象组织内容；后续再逐步升级为自动采集与核验流程。</p>
+    </div>
+    <div class="nav-row">
+      <a class="nav-link" href="phase2_progress.md" target="_blank">查看阶段进展</a>
+      <a class="nav-link" href="docs/benchmark_schema.csv" target="_blank">查看 CSV</a>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-title"><h3>一、数据来源</h3><div class="desc">当前以高校公开网页为主</div></div>
+      <div class="bar-list">
+        <div class="note-card"><div class="title">公开项目页面</div><div class="text">学校官网、本科生院、荣誉学院、书院、项目专页、培养方案、FAQ 等公开页面。</div></div>
+        <div class="note-card"><div class="title">新闻与成果展示页</div><div class="text">仅作为项目风格和成果展示的补充证据，不作为唯一依据。</div></div>
+        <div class="note-card"><div class="title">本地结构化文件</div><div class="text">当前项目以 <code>docs/benchmark_schema.csv</code> 为基础，并由 <code>assets/js/benchmark_data.js</code> 提供前端可直接读取的 demo 数据。</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><h3>二、采集边界</h3><div class="desc">边界清楚，系统才可信</div></div>
+      <div class="bar-list">
+        <div class="note-card"><div class="title">只采公开项目级信息</div><div class="text">只展示学校项目、培养机制、公开制度说明、公开成果展示等内容。</div></div>
+        <div class="note-card"><div class="title">不采私人学生数据</div><div class="text">不展示任何真实学生的个人隐私、成绩明细、私人履历、联系方式或非公开记录。</div></div>
+        <div class="note-card"><div class="title">不做侵入式抓取</div><div class="text">不登录、不绕权限、不抓受限页面，不做高频并发式采集。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:16px;">
+    <div class="panel">
+      <div class="panel-title"><h3>三、比较方法</h3><div class="desc">当前原型采用轻量结构化比较</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>比较维度</th><th>当前含义</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>导师制</td><td>是否存在稳定导师与导学支持</td><td>看机制是否实质运行，而非仅停留在口号。</td></tr>
+            <tr><td>科研训练</td><td>本科阶段是否较早接触研究</td><td>看是否存在实验室、项目、研讨或独立研究路径。</td></tr>
+            <tr><td>国际交流</td><td>国际课程、交换或海外学习资源</td><td>强调是否嵌入培养过程，而非偶发机会。</td></tr>
+            <tr><td>资助支持</td><td>奖助、项目经费、制度托底</td><td>当前只做粗粒度结构化展示。</td></tr>
+            <tr><td>选拔机制</td><td>公开透明度与潜力识别方式</td><td>不对优劣做结论化判断，只展示结构特征。</td></tr>
+            <tr><td>学科覆盖</td><td>单学科/跨学科/通识探索程度</td><td>帮助理解项目更偏“纵深”还是更偏“宽口径”。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><h3>四、注意事项</h3><div class="desc">避免误读与过度解读</div></div>
+      <div class="bar-list">
+        <div class="note-card"><div class="title">本页不是官方评价排名</div><div class="text">页面中的分值和图形只是为了做结构化展示，不代表官方打分或最终优劣结论。</div></div>
+        <div class="note-card"><div class="title">公开信息天然不完整</div><div class="text">不同学校公开页面详略不一，因此当前对比更适合做“机制画像”，不适合做过度精细化排名。</div></div>
+        <div class="note-card"><div class="title">建议结合人工核验</div><div class="text">尤其是选拔方式、资助政策、国际交流等字段，应在下一阶段建立来源记录与人工核验流程。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px;">
+    <div class="panel-title"><h3>五、下一步如何进入“全网公开项目采集”</h3><div class="desc">建议小步快跑，不要一开始就铺太大</div></div>
+    <div class="bar-list">
+      <div class="note-card"><div class="title">步骤 1：扩充种子清单</div><div class="text">围绕 C9、Ivy、研究型高校，先建立学校—项目—官网 URL 的清单。</div></div>
+      <div class="note-card"><div class="title">步骤 2：增加来源记录</div><div class="text">为每个项目建立来源页面、抓取日期、核验状态与备注，避免数据“来源不明”。</div></div>
+      <div class="note-card"><div class="title">步骤 3：从 CSV 升级为 JSON/API</div><div class="text">在前端已验证结构后，再考虑做轻量脚本把 CSV 转成 JSON，或由后端提供 benchmark 接口。</div></div>
+      <div class="note-card"><div class="title">步骤 4：分主题采集</div><div class="text">优先采集导师制、科研训练、国际交流、资助支持四类高价值字段，避免一开始字段太多难维护。</div></div>
+    </div>
+    <div class="footer-note">再次强调：平台中的对标部分只展示公开项目级信息，不涉及任何私人学生数据；人物画像部分与高校对标部分在数据治理上应明确分层。</div>
+  </div>
+</div>
+</body>
+</html>
