@@ -449,6 +449,50 @@
         }
         .scroll-top.visible { opacity: 1; pointer-events: auto; }
         .scroll-top:hover { transform: translateY(-2px); background: rgba(246,232,209,0.92); }
+        .loading-banner {
+            margin: 14px 0 0;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(122,31,53,0.10);
+            background: linear-gradient(rgba(255,251,246,0.90), rgba(250,244,237,0.92));
+            color: var(--muted);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 12px 24px rgba(110,78,52,0.08);
+        }
+        .loading-banner.show { display: flex; }
+        .loading-banner .title { color: var(--text); font-weight: 700; }
+        .loading-banner .hint { font-size: 12px; }
+        .loading-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 rgba(199,154,98,0.55);
+            animation: pulseDot 1.3s infinite;
+            flex: 0 0 auto;
+        }
+        .loading-state {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+            padding: 14px 0;
+        }
+        .directory-loading {
+            padding: 18px 14px;
+            border: 1px dashed rgba(122,31,53,0.14);
+            border-radius: 14px;
+            background: rgba(255,251,246,0.66);
+            color: var(--muted);
+            font-size: 13px;
+        }
+        @keyframes pulseDot {
+            0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(199,154,98,0.48); }
+            70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(199,154,98,0); }
+            100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(199,154,98,0); }
+        }
     </style>
 </head>
 <body>
@@ -499,6 +543,17 @@
                 <a class="btn" href="benchmark_compare.html" target="_blank">多校比较</a>
             </div>
         </div>
+    </div>
+
+    <div class="loading-banner" id="loadingBanner">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="loading-dot"></div>
+            <div>
+                <div class="title" id="loadingTitle">页面正在准备中</div>
+                <div class="hint" id="loadingHint">首次访问 Render 免费服务时，服务器可能需要先唤醒。</div>
+            </div>
+        </div>
+        <div class="hint" id="loadingStep">正在连接服务...</div>
     </div>
 
     <div class="kpis" id="kpis"></div>
@@ -621,10 +676,10 @@
 
 <div class="assistant-fab" onclick="toggleAssistant()">相辉<br>小助手</div>
 <div class="assistant-panel" id="assistantPanel">
-    <div class="assistant-head">
-        <div style="font-weight:700; color:var(--gold);">相辉小助手</div>
-        <div class="desc">已接入 DeepSeek，可结合 200 名学生数据回答</div>
-    </div>
+        <div class="assistant-head">
+            <div style="font-weight:700; color:var(--gold);">相辉小助手</div>
+        <div class="desc">可结合 200 名学生数据做群体分析与解释</div>
+        </div>
     <div class="assistant-quick">
         <div class="quick-chip" onclick="quickAsk('这200名学生最明显的整体特征是什么？','overview')">整体特征</div>
         <div class="quick-chip" onclick="quickAsk('哪类学生最需要重点关注？','overview')">重点关注</div>
@@ -688,6 +743,7 @@ let overviewState = null;
 let activeFilters = { student_type: '', warning_level: '' };
 let activeGrade = '';
 let dirSort = { key: '', dir: 1 };
+let pageLoading = false;
 
 // ── 工具 ──────────────────────────────────────────────────
 function levelClass(level) { return ['red','yellow','green','none'].includes(level) ? level : 'none'; }
@@ -746,6 +802,26 @@ function updateFilterStatus() {
     document.querySelectorAll('.grade-btn').forEach(btn => {
         btn.classList.toggle('active', (btn.dataset.grade || '') === String(activeGrade));
     });
+}
+function setLoadingState(active, step = '', hint = '') {
+    pageLoading = active;
+    const banner = document.getElementById('loadingBanner');
+    banner.classList.toggle('show', active);
+    if (step) document.getElementById('loadingStep').innerText = step;
+    if (hint) document.getElementById('loadingHint').innerText = hint;
+    document.getElementById('loadingTitle').innerText = active ? '页面正在准备中' : '页面已完成主要加载';
+}
+function setInitialPlaceholders() {
+    document.getElementById('kpis').innerHTML = Array.from({ length: 6 }).map(() => `
+        <div class="kpi"><div class="label">加载中</div><div class="value">--</div></div>
+    `).join('');
+    document.getElementById('findings').innerHTML = `<div class="loading-state">正在汇总群体摘要与关键发现...</div>`;
+    document.getElementById('leftInsights').innerHTML = `<div class="loading-state">正在准备页面导览...</div>`;
+    document.getElementById('miniMetrics').innerHTML = `<div class="loading-state">正在载入制度支持指标...</div>`;
+    document.getElementById('studentGrid').innerHTML = `<div class="loading-state">正在载入重点学生入口...</div>`;
+    document.getElementById('groupTable').innerHTML = `<tr><td colspan="5" class="loading-state">正在载入分组对比...</td></tr>`;
+    document.getElementById('directoryList').innerHTML = `<div class="directory-loading">正在准备全部学生名录。为减少首次打开等待，这部分会在主图表之后继续加载。</div>`;
+    document.getElementById('directoryCount').innerText = '载入中';
 }
 async function clearFilters() {
     activeFilters = { student_type: '', warning_level: '' };
@@ -970,13 +1046,23 @@ async function showGroupDetail(groupBy, groupName) {
     renderDetailTable(rows, [{ key: 'group', label: '分组' }, { key: 'count', label: '人数' }, { key: 'avg_academic_interest', label: '志趣' }, { key: 'avg_research_engagement', label: '科研' }, { key: 'avg_mental_health', label: '心理' }]);
 }
 async function refreshOverviewPage() {
-    await Promise.all([
-        loadOverview(),
+    setLoadingState(true, '正在载入核心画像...', '首次访问若较慢，通常是 Render 免费实例正在唤醒。');
+    await loadOverview();
+    setLoadingState(true, '核心图表已完成，正在补充分组与学生入口...', '你已经可以先浏览主图和关键指标，次要区域会继续补齐。');
+    await Promise.allSettled([
         loadWarnings(),
         loadStudents(),
-        loadAllStudents(),
         loadGroupCompare(),
     ]);
+    setLoadingState(true, '正在准备全部学生名录...', '学生名录数据量更大，因此会放到最后加载，避免首屏等待过长。');
+    setTimeout(async () => {
+        try {
+            await loadAllStudents();
+        } finally {
+            setLoadingState(false, '页面加载完成', '如果长时间未访问，Render 免费实例下次首次打开仍可能需要短暂唤醒。');
+            setTimeout(() => setLoadingState(false), 1400);
+        }
+    }, 120);
 }
 function openStudent(id, name) { const url = `student_formal.html?id=${id}`; window.open(url, '_blank'); }
 function closeOverlay() { document.getElementById('studentOverlay').classList.remove('show'); document.getElementById('studentFrame').src = 'about:blank'; }
@@ -1012,6 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function init() {
+    setInitialPlaceholders();
     updateFilterStatus();
     await refreshOverviewPage();
     const ro = new ResizeObserver(() => {
