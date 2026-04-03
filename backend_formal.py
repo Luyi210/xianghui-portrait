@@ -37,6 +37,9 @@ MARKDOWN_FILES = {
     'phase1_plan.md',
     'phase2_progress.md',
     'phase3_progress.md',
+    'PROJECT_FILE_GUIDE.md',
+    'UPDATE_WEBSITE_WORKFLOW.md',
+    'DEPLOY_RENDER.md',
 }
 PUBLIC_DOC_FILES = {
     'benchmark_schema.csv',
@@ -182,7 +185,7 @@ def frontend_markdown_file(doc_name: str):
     filename = f'{doc_name}.md'
     if filename not in MARKDOWN_FILES:
         raise HTTPException(status_code=404, detail='文件不存在')
-    return public_file_response(filename)
+    return public_file_response(os.path.join('docs', filename))
 
 
 @app.get('/docs/{file_name}', include_in_schema=False)

@@ -66,7 +66,7 @@
   - `/api/formal/churn_risk`
   - `/api/formal/classes`
 - 启动端口配置为 `8002`。
-- 代码里还包含 DeepSeek API 调用逻辑，用于“相辉小助手”。
+- 代码里还包含可配置 AI 服务接入逻辑。
 
 ### `formal_data_generate.py`
 - 模拟学生画像数据生成脚本。
@@ -77,15 +77,6 @@
 - 当前前后端共同使用的核心数据文件。
 - 存放模拟学生样本，是 `backend_formal.py` 的直接数据来源。
 - 包含学生基础属性、画像维度、风险、建议、百分位等字段。
-
-### `backend_formal.pid`
-- 后端进程 PID 文件。
-- 一般用于记录当前运行中的后端进程号，方便脚本或手动停止服务。
-- 当前文件内容看起来很短，符合 PID 文件特征。
-
-### `backend_formal_stdout.log`
-- 后端标准输出日志文件。
-- 当前是空文件，说明最近没有写入日志，或者服务启动方式未把输出重定向到这里。
 
 ### `1.jpeg`
 - 页面背景图片资源。
@@ -107,14 +98,6 @@
 - 负责统一复旦专题风格，例如 banner、品牌导航、色彩、标题体系等。
 - 群体画像页、个人画像页、对标页和说明页都会引用它。
 
-### `assets/brand/fudan-academic-bg.svg`
-- SVG 背景图资源。
-- 从命名看更偏“学术主题”背景，用于品牌视觉或装饰层。
-
-### `assets/brand/fudan-guanghua-bg.svg`
-- SVG 背景图资源。
-- 从命名看更偏“光华楼/校内建筑主题”背景，用于品牌视觉或装饰层。
-
 ## 编辑器与环境配置
 
 ### `.vscode/settings.json`
@@ -122,10 +105,6 @@
 - 当前主要指定：
   - Python 默认解释器使用工作区内的 `.venv/bin/python`
   - 打开终端时自动激活虚拟环境
-
-### `.DS_Store`
-- macOS 自动生成的目录元数据文件。
-- 与业务无关，可以忽略。
 
 ## 目录级说明
 
@@ -139,25 +118,19 @@
 - 存放解释器、`pip`、依赖包等。
 - 用于保证项目运行环境隔离。
 
-## 当前被页面引用、但目录中未找到的文件
+## 当前被页面引用的说明文件
 
-以下文件在页面链接里被引用过，但目前不在当前目录中：
-
-### `phase1_plan.md`
+### `docs/phase1_plan.md`
 - 在 `resources_fudan.html`、`policy_overview.html` 中被链接为阶段文档。
-- 当前缺失。
 
-### `phase2_progress.md`
+### `docs/phase2_progress.md`
 - 在 `student_formal.html`、`data_methodology.html` 中被链接为阶段文档。
-- 当前缺失。
 
-### `phase3_progress.md`
+### `docs/phase3_progress.md`
 - 在 `index_formal.html`、`benchmark_overview.html`、`benchmark_compare.html` 中被链接为阶段文档。
-- 当前缺失。
 
 ### `docs/benchmark_schema.csv`
 - 在 `data_methodology.html` 中被说明为本地结构化对标数据文件。
-- 当前缺失。
 
 ## 一句话理解这个项目
 
