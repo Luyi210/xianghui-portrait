@@ -40,9 +40,23 @@ MARKDOWN_FILES = {
     'PROJECT_FILE_GUIDE.md',
     'UPDATE_WEBSITE_WORKFLOW.md',
     'DEPLOY_RENDER.md',
+    '八周企业化升级计划.md',
+    '人物画像可视化项目全面说明.md',
 }
 PUBLIC_DOC_FILES = {
     'benchmark_schema.csv',
+    'phase1_plan.md',
+    'phase2_progress.md',
+    'phase3_progress.md',
+    'PROJECT_FILE_GUIDE.md',
+    'UPDATE_WEBSITE_WORKFLOW.md',
+    'DEPLOY_RENDER.md',
+    'DIRECTORY_STRUCTURE.md',
+    'EXTEND_PROJECT_GUIDE.md',
+    'plan_pdf.css',
+    '八周企业化升级计划.html',
+    '八周企业化升级计划.md',
+    '人物画像可视化项目全面说明.md',
 }
 DIMENSION_LABELS = {
     'dim_academic_interest': '学术志趣',
@@ -79,9 +93,11 @@ def build_openai_client():
     api_key = AI_API_KEY or DEEPSEEK_API_KEY
     if not api_key:
         return None
-    base_url = AI_BASE_URL or 'https://api.deepseek.com'
+    base_url = AI_BASE_URL or ('https://api.deepseek.com' if DEEPSEEK_API_KEY and not AI_API_KEY else '')
     try:
-        return OpenAI(api_key=api_key, base_url=normalize_base_url(base_url))
+        if base_url:
+            return OpenAI(api_key=api_key, base_url=normalize_base_url(base_url))
+        return OpenAI(api_key=api_key)
     except Exception:
         return None
 
@@ -662,9 +678,9 @@ def formal_mentors(grade: Optional[int] = Query(default=None)):
             'dimensions': dims,
             'mentor_coverage_rate': mentor_rate,
             'avg_type_confidence': round(float(sub['student_type_confidence'].mean()), 2),
-            'research_rate': round(float((sub['research_participation_level'] >= 3).mean() * 100), 1),
+            'research_rate': round(float((sub['research_participation_level'] >= 60).mean() * 100), 1),
             'avg_mental_health': round(float(sub['dim_mental_health'].mean()), 2),
-            'overload_rate': round(float((sub['stress_level'] >= 4).mean() * 100), 1),
+            'overload_rate': round(float(((sub['stress_level'] >= 75) | (sub['workload_feeling'] >= 80)).mean() * 100), 1),
             'warning_distribution': {
                 'red': int(wc.get('red', 0)),
                 'yellow': int(wc.get('yellow', 0)),
@@ -768,8 +784,8 @@ def formal_prediction(
 
     risk_defs = {
         'mental': {
-            'condition': lambda r: r['dim_mental_health'] < 45 and r['stress_level'] >= 3,
-            'score': lambda r: max(0, 45 - r['dim_mental_health']) + r['stress_level'] * 5,
+            'condition': lambda r: r['dim_mental_health'] < 45 and r['stress_level'] >= 65,
+            'score': lambda r: max(0, 45 - r['dim_mental_health']) * 1.2 + max(0, r['stress_level'] - 65) * 0.8,
             'label': '心理健康预警风险',
         },
         'research': {
@@ -783,8 +799,8 @@ def formal_prediction(
             'label': '导师缺失风险',
         },
         'academic': {
-            'condition': lambda r: r['stress_level'] >= 4 and r['dim_resilience'] < 55,
-            'score': lambda r: (r['stress_level'] - 3) * 10 + max(0, 55 - r['dim_resilience']),
+            'condition': lambda r: r['stress_level'] >= 75 and r['dim_resilience'] < 55,
+            'score': lambda r: max(0, r['stress_level'] - 75) * 0.8 + max(0, 55 - r['dim_resilience']),
             'label': '学业压力超载风险',
         },
     }
@@ -807,7 +823,7 @@ def formal_prediction(
                         'student_id': sid,
                         'name': row['name'],
                         'grade': int(row['grade']),
-                        'major_type': row['major_track'],
+                        'major_track': row['major_track'],
                         'risk_type': rtype,
                         'risk_label': rule['label'],
                         'risk_score': round(score, 1),
@@ -908,11 +924,11 @@ def formal_churn_risk(
 
     records = []
     for _, row in df.iterrows():
-        mental = max(0, 55 - row['dim_mental_health']) * 2
-        research = max(0, 45 - row['dim_research_engagement']) * 1.5
-        mentor = 40 if row['has_fixed_mentor'] == 0 else 0
-        stress = (row['stress_level'] - 2) * 15 if row['stress_level'] >= 3 else 0
-        confidence = max(0, 60 - row['student_type_confidence'] * 100) * 0.5
+        mental = min(100, max(0, 55 - row['dim_mental_health']) * 2.5)
+        research = min(100, max(0, 45 - row['dim_research_engagement']) * 2.5)
+        mentor = 100 if row['has_fixed_mentor'] == 0 else 0
+        stress = min(100, max(0, row['stress_level'] - 60) * 2.5)
+        confidence = min(100, max(0, 60 - row['student_type_confidence']) * 2.5)
         total = min(100, round(mental * 0.3 + research * 0.2 + mentor * 0.2 + stress * 0.2 + confidence * 0.1, 1))
         if total < threshold:
             continue

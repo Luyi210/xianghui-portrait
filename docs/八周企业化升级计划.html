@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>人物画像可视化项目企业化升级八周计划</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="plan_pdf.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">人物画像可视化项目企业化升级八周计划</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#人物画像可视化项目企业化升级八周计划"
+id="toc-人物画像可视化项目企业化升级八周计划">人物画像可视化项目企业化升级八周计划</a>
+<ul>
+<li><a href="#文档说明" id="toc-文档说明">文档说明</a></li>
+<li><a href="#一先说结论推荐的最终方向"
+id="toc-一先说结论推荐的最终方向">一、先说结论：推荐的最终方向</a>
+<ul>
+<li><a href="#推荐技术路线" id="toc-推荐技术路线">1.
+推荐技术路线</a></li>
+<li><a href="#为什么推荐这一套" id="toc-为什么推荐这一套">2.
+为什么推荐这一套</a></li>
+<li><a href="#为什么不建议继续只用原生-html-迭代"
+id="toc-为什么不建议继续只用原生-html-迭代">3. 为什么不建议继续只用原生
+HTML 迭代</a></li>
+</ul></li>
+<li><a href="#二你当前项目的现实状态评估"
+id="toc-二你当前项目的现实状态评估">二、你当前项目的现实状态评估</a>
+<ul>
+<li><a href="#你已经做到了什么" id="toc-你已经做到了什么">1.
+你已经做到了什么</a></li>
+<li><a href="#你当前的主要问题不在low而在工程化不够"
+id="toc-你当前的主要问题不在low而在工程化不够">2.
+你当前的主要问题不在“low”，而在“工程化不够”</a></li>
+</ul></li>
+<li><a href="#三vuereactnext.jsnuxt-到底该怎么选"
+id="toc-三vuereactnext.jsnuxt-到底该怎么选">三、Vue、React、Next.js、Nuxt
+到底该怎么选</a>
+<ul>
+<li><a href="#vue-能不能用" id="toc-vue-能不能用">1. Vue
+能不能用</a></li>
+<li><a href="#react-能不能用" id="toc-react-能不能用">2. React
+能不能用</a></li>
+<li><a href="#我的建议选-react但不是裸-react"
+id="toc-我的建议选-react但不是裸-react">3. 我的建议：选 React，但不是裸
+React</a></li>
+<li><a href="#vue-路线什么时候也值得选"
+id="toc-vue-路线什么时候也值得选">4. Vue 路线什么时候也值得选</a></li>
+</ul></li>
+<li><a href="#四推荐技术栈分别是做什么的"
+id="toc-四推荐技术栈分别是做什么的">四、推荐技术栈分别是做什么的</a>
+<ul>
+<li><a href="#next.js" id="toc-next.js">1. Next.js</a></li>
+<li><a href="#react" id="toc-react">2. React</a></li>
+<li><a href="#typescript" id="toc-typescript">3. TypeScript</a></li>
+<li><a href="#fastapi" id="toc-fastapi">4. FastAPI</a></li>
+<li><a href="#postgresql" id="toc-postgresql">5. PostgreSQL</a></li>
+<li><a href="#sqlalchemy" id="toc-sqlalchemy">6. SQLAlchemy</a></li>
+<li><a href="#alembic" id="toc-alembic">7. Alembic</a></li>
+<li><a href="#auth.js-登录鉴权方案" id="toc-auth.js-登录鉴权方案">8.
+Auth.js / 登录鉴权方案</a></li>
+<li><a href="#playwright" id="toc-playwright">9. Playwright</a></li>
+<li><a href="#github-actions" id="toc-github-actions">10. GitHub
+Actions</a></li>
+<li><a href="#docker" id="toc-docker">11. Docker</a></li>
+<li><a href="#sentry" id="toc-sentry">12. Sentry</a></li>
+</ul></li>
+<li><a href="#五企业化升级的底层逻辑图"
+id="toc-五企业化升级的底层逻辑图">五、企业化升级的底层逻辑图</a>
+<ul>
+<li><a href="#不只是换框架而是升级四个层次"
+id="toc-不只是换框架而是升级四个层次">1.
+不只是“换框架”，而是升级四个层次</a></li>
+<li><a href="#你的项目升级思路图" id="toc-你的项目升级思路图">2.
+你的项目升级思路图</a></li>
+<li><a href="#你以后要具备的完整工程图"
+id="toc-你以后要具备的完整工程图">3. 你以后要具备的完整工程图</a></li>
+</ul></li>
+<li><a href="#六八周总体安排总览"
+id="toc-六八周总体安排总览">六、八周总体安排总览</a>
+<ul>
+<li><a href="#八周总目标图" id="toc-八周总目标图">八周总目标图</a></li>
+<li><a href="#八周完成后的目标状态"
+id="toc-八周完成后的目标状态">八周完成后的目标状态</a></li>
+</ul></li>
+<li><a href="#七八周详细计划"
+id="toc-七八周详细计划">七、八周详细计划</a></li>
+<li><a href="#第-1-周定路线搭脚手架补核心基础"
+id="toc-第-1-周定路线搭脚手架补核心基础">第 1
+周：定路线、搭脚手架、补核心基础</a>
+<ul>
+<li><a href="#本周目标" id="toc-本周目标">本周目标</a></li>
+<li><a href="#为什么先做这个"
+id="toc-为什么先做这个">为什么先做这个</a></li>
+<li><a href="#本周学习内容" id="toc-本周学习内容">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务"
+id="toc-本周要做的项目任务">本周要做的项目任务</a></li>
+<li><a href="#本周交付物" id="toc-本周交付物">本周交付物</a></li>
+<li><a href="#本周验收标准" id="toc-本周验收标准">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-2-周组件化前端基础与设计系统初版"
+id="toc-第-2-周组件化前端基础与设计系统初版">第 2
+周：组件化前端基础与设计系统初版</a>
+<ul>
+<li><a href="#本周目标-1" id="toc-本周目标-1">本周目标</a></li>
+<li><a href="#本周学习内容-1"
+id="toc-本周学习内容-1">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-1"
+id="toc-本周要做的项目任务-1">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-1" id="toc-本周交付物-1">本周交付物</a></li>
+<li><a href="#本周验收标准-1"
+id="toc-本周验收标准-1">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-3-周后端模块化改造" id="toc-第-3-周后端模块化改造">第 3
+周：后端模块化改造</a>
+<ul>
+<li><a href="#本周目标-2" id="toc-本周目标-2">本周目标</a></li>
+<li><a href="#本周学习内容-2"
+id="toc-本周学习内容-2">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-2"
+id="toc-本周要做的项目任务-2">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-2" id="toc-本周交付物-2">本周交付物</a></li>
+<li><a href="#本周验收标准-2"
+id="toc-本周验收标准-2">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-4-周数据库设计与数据入库"
+id="toc-第-4-周数据库设计与数据入库">第 4 周：数据库设计与数据入库</a>
+<ul>
+<li><a href="#本周目标-3" id="toc-本周目标-3">本周目标</a></li>
+<li><a href="#本周学习内容-3"
+id="toc-本周学习内容-3">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-3"
+id="toc-本周要做的项目任务-3">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-3" id="toc-本周交付物-3">本周交付物</a></li>
+<li><a href="#本周验收标准-3"
+id="toc-本周验收标准-3">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-5-周迁移群体页与学生页"
+id="toc-第-5-周迁移群体页与学生页">第 5 周：迁移群体页与学生页</a>
+<ul>
+<li><a href="#本周目标-4" id="toc-本周目标-4">本周目标</a></li>
+<li><a href="#本周学习内容-4"
+id="toc-本周学习内容-4">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-4"
+id="toc-本周要做的项目任务-4">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-4" id="toc-本周交付物-4">本周交付物</a></li>
+<li><a href="#本周验收标准-4"
+id="toc-本周验收标准-4">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-6-周迁移对标模块与资源模块"
+id="toc-第-6-周迁移对标模块与资源模块">第 6
+周：迁移对标模块与资源模块</a>
+<ul>
+<li><a href="#本周目标-5" id="toc-本周目标-5">本周目标</a></li>
+<li><a href="#本周学习内容-5"
+id="toc-本周学习内容-5">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-5"
+id="toc-本周要做的项目任务-5">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-5" id="toc-本周交付物-5">本周交付物</a></li>
+<li><a href="#本周验收标准-5"
+id="toc-本周验收标准-5">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-7-周权限测试监控与质量保障"
+id="toc-第-7-周权限测试监控与质量保障">第 7
+周：权限、测试、监控与质量保障</a>
+<ul>
+<li><a href="#本周目标-6" id="toc-本周目标-6">本周目标</a></li>
+<li><a href="#本周学习内容-6"
+id="toc-本周学习内容-6">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-6"
+id="toc-本周要做的项目任务-6">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-6" id="toc-本周交付物-6">本周交付物</a></li>
+<li><a href="#本周验收标准-6"
+id="toc-本周验收标准-6">本周验收标准</a></li>
+</ul></li>
+<li><a href="#第-8-周收尾上线文档沉淀下一阶段规划"
+id="toc-第-8-周收尾上线文档沉淀下一阶段规划">第 8
+周：收尾上线、文档沉淀、下一阶段规划</a>
+<ul>
+<li><a href="#本周目标-7" id="toc-本周目标-7">本周目标</a></li>
+<li><a href="#本周学习内容-7"
+id="toc-本周学习内容-7">本周学习内容</a></li>
+<li><a href="#本周要做的项目任务-7"
+id="toc-本周要做的项目任务-7">本周要做的项目任务</a></li>
+<li><a href="#本周交付物-7" id="toc-本周交付物-7">本周交付物</a></li>
+<li><a href="#本周验收标准-7"
+id="toc-本周验收标准-7">本周验收标准</a></li>
+</ul></li>
+<li><a href="#八学习顺序建议"
+id="toc-八学习顺序建议">八、学习顺序建议</a>
+<ul>
+<li><a href="#推荐优先级" id="toc-推荐优先级">推荐优先级</a></li>
+</ul></li>
+<li><a href="#九你后面最需要形成的能力不是背-api而是这几种思维"
+id="toc-九你后面最需要形成的能力不是背-api而是这几种思维">九、你后面最需要形成的能力，不是背
+API，而是这几种思维</a>
+<ul>
+<li><a href="#组件思维" id="toc-组件思维">1. 组件思维</a></li>
+<li><a href="#数据思维" id="toc-数据思维">2. 数据思维</a></li>
+<li><a href="#分层思维" id="toc-分层思维">3. 分层思维</a></li>
+<li><a href="#可维护思维" id="toc-可维护思维">4. 可维护思维</a></li>
+<li><a href="#系统思维" id="toc-系统思维">5. 系统思维</a></li>
+</ul></li>
+<li><a href="#十最容易踩的坑"
+id="toc-十最容易踩的坑">十、最容易踩的坑</a>
+<ul>
+<li><a href="#坑-1一上来就全量重写" id="toc-坑-1一上来就全量重写">坑
+1：一上来就全量重写</a></li>
+<li><a href="#坑-2只换前端不动数据" id="toc-坑-2只换前端不动数据">坑
+2：只换前端，不动数据</a></li>
+<li><a href="#坑-3同时学太多技术" id="toc-坑-3同时学太多技术">坑
+3：同时学太多技术</a></li>
+<li><a href="#坑-4太早追求复杂架构" id="toc-坑-4太早追求复杂架构">坑
+4：太早追求复杂架构</a></li>
+<li><a href="#坑-5忽略文档和测试" id="toc-坑-5忽略文档和测试">坑
+5：忽略文档和测试</a></li>
+</ul></li>
+<li><a href="#十一八周之外的中长期规划"
+id="toc-十一八周之外的中长期规划">十一、八周之外的中长期规划</a>
+<ul>
+<li><a href="#后台内容维护系统" id="toc-后台内容维护系统">1.
+后台内容维护系统</a></li>
+<li><a href="#数据审核机制" id="toc-数据审核机制">2.
+数据审核机制</a></li>
+<li><a href="#报告导出" id="toc-报告导出">3. 报告导出</a></li>
+<li><a href="#更正式的权限系统" id="toc-更正式的权限系统">4.
+更正式的权限系统</a></li>
+<li><a href="#更稳定的生产部署" id="toc-更稳定的生产部署">5.
+更稳定的生产部署</a></li>
+</ul></li>
+<li><a href="#十二给你的最终建议"
+id="toc-十二给你的最终建议">十二、给你的最终建议</a></li>
+<li><a href="#十三推荐官方学习资料"
+id="toc-十三推荐官方学习资料">十三、推荐官方学习资料</a>
+<ul>
+<li><a href="#前端与框架" id="toc-前端与框架">前端与框架</a></li>
+<li><a href="#后端与数据库" id="toc-后端与数据库">后端与数据库</a></li>
+<li><a href="#工程与质量" id="toc-工程与质量">工程与质量</a></li>
+<li><a href="#鉴权" id="toc-鉴权">鉴权</a></li>
+</ul></li>
+<li><a href="#十四最后的落地建议"
+id="toc-十四最后的落地建议">十四、最后的落地建议</a></li>
+<li><a href="#附录一句话版本的技术定位"
+id="toc-附录一句话版本的技术定位">附录：一句话版本的技术定位</a>
+<ul>
+<li><a href="#当前项目" id="toc-当前项目">当前项目</a></li>
+<li><a href="#目标项目" id="toc-目标项目">目标项目</a></li>
+<li><a href="#核心升级路线" id="toc-核心升级路线">核心升级路线</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="人物画像可视化项目企业化升级八周计划">人物画像可视化项目企业化升级八周计划</h1>
+<h2 id="文档说明">文档说明</h2>
+<p>这份文档面向当前“人物画像可视化”项目，目标不是泛泛讨论前端框架，也不是只给一个技术名词列表，而是要回答下面这些更实际的问题：</p>
+<ul>
+<li>这个项目如果要向企业级网站/系统靠拢，应该往什么方向升级？</li>
+<li>到底是继续堆原生 HTML，还是迁移到 Vue / React 一类框架？</li>
+<li>如果迁移，应该迁到什么技术栈，为什么？</li>
+<li>未来 8 周具体应该怎么安排，先做什么，后做什么？</li>
+<li>每周应该学习哪些技术，它们分别解决什么问题，怎么使用？</li>
+<li>什么是“企业化升级”的底层逻辑，而不是只换个壳？</li>
+</ul>
+<p>本计划结合当前项目现状来设计：你已经有页面、有后端、有数据、有线上部署，所以最好的路线不是推倒重来，而是“保留业务逻辑，升级工程承载方式”。</p>
+<hr />
+<h2 id="一先说结论推荐的最终方向">一、先说结论：推荐的最终方向</h2>
+<h3 id="推荐技术路线">1. 推荐技术路线</h3>
+<p>对于你当前这个项目，最推荐的企业化升级路线是：</p>
+<pre class="text"><code>前端：Next.js + React + TypeScript
+后端：FastAPI
+数据库：PostgreSQL
+ORM：SQLAlchemy
+数据库迁移：Alembic
+鉴权：Auth.js（或基于 JWT 的登录方案）
+图表：ECharts
+测试：pytest + Playwright
+部署：Docker + GitHub Actions + Render / 云服务器
+监控：Sentry</code></pre>
+<h3 id="为什么推荐这一套">2. 为什么推荐这一套</h3>
+<p>原因不是“React 比 Vue
+高级”，也不是“流行就该用”，而是因为你的项目类型更像：</p>
+<ul>
+<li>数据驱动平台</li>
+<li>教学管理/分析系统</li>
+<li>多页面、多图表、多权限、多角色系统</li>
+<li>后期会有后台录入、数据维护、日志、导出和 AI 能力</li>
+</ul>
+<p>这类项目更适合“前后端分层、数据正式化、页面组件化”的路线，而不是继续在单个
+HTML 中堆 JavaScript。</p>
+<h3 id="为什么不建议继续只用原生-html-迭代">3. 为什么不建议继续只用原生
+HTML 迭代</h3>
+<p>原生 HTML + 内嵌 JS 的优势是：</p>
+<ul>
+<li>起步快</li>
+<li>页面立刻可见</li>
+<li>原型开发很顺手</li>
+</ul>
+<p>但它的劣势会随着项目增长迅速放大：</p>
+<ul>
+<li>页面一多，重复代码越来越多</li>
+<li>同类组件无法统一维护</li>
+<li>接口请求、状态管理、页面逻辑容易散落各处</li>
+<li>后续加登录、权限、后台管理时很痛苦</li>
+<li>改一个公共样式或公共逻辑，容易牵一发而动全身</li>
+</ul>
+<p>所以，企业化升级的第一步不是“再加一页”，而是“让项目可持续维护”。</p>
+<hr />
+<h2 id="二你当前项目的现实状态评估">二、你当前项目的现实状态评估</h2>
+<h3 id="你已经做到了什么">1. 你已经做到了什么</h3>
+<p>当前项目并不是普通网页作业，而是一个功能完整的原型系统，已经具备以下能力：</p>
+<ul>
+<li>有多个页面组成完整业务链路</li>
+<li>有群体画像页和个人画像页</li>
+<li>有高校对标模块</li>
+<li>有资源承接页和方法说明页</li>
+<li>有 FastAPI 后端</li>
+<li>有 CSV 数据源与前端 JS 数据源</li>
+<li>有 AI 问答接口</li>
+<li>有 GitHub + Render 线上访问能力</li>
+</ul>
+<p>换句话说，你现在最大的优势不是技术栈，而是<strong>业务逻辑已经很完整</strong>。</p>
+<h3 id="你当前的主要问题不在low而在工程化不够">2.
+你当前的主要问题不在“low”，而在“工程化不够”</h3>
+<p>当前项目距离企业级系统的差距，主要不在于颜色、图表或者页面看起来够不够高级，而在于下面这些方面：</p>
+<ul>
+<li>数据还是 CSV / JS 文件，缺少正式数据库</li>
+<li>前端逻辑直接写在 HTML 内部，维护成本高</li>
+<li>没有统一的组件层和接口层</li>
+<li>没有登录、权限、后台维护系统</li>
+<li>没有操作日志、异常监控、测试体系</li>
+<li>没有明确的数据更新和审核流程</li>
+</ul>
+<p>这也是为什么后面的升级重点不应该是“换个视觉风格”，而应该是“升级系统骨架”。</p>
+<hr />
+<h2
+id="三vuereactnext.jsnuxt-到底该怎么选">三、Vue、React、Next.js、Nuxt
+到底该怎么选</h2>
+<h3 id="vue-能不能用">1. Vue 能不能用</h3>
+<p>可以，当然可以。Vue 适合：</p>
+<ul>
+<li>入门更平滑</li>
+<li>单人开发体验好</li>
+<li>模板语法直观</li>
+<li>中小型后台项目也非常常见</li>
+</ul>
+<p>如果你已经熟悉 Vue，走 <code>Vue + Nuxt</code>
+也是一条完全可行的路线。</p>
+<h3 id="react-能不能用">2. React 能不能用</h3>
+<p>也可以，而且更适合你当前这个项目未来的发展方向。React
+的优势在于：</p>
+<ul>
+<li>组件化思维更彻底</li>
+<li>配套生态成熟</li>
+<li>企业平台和中后台场景很常见</li>
+<li>与 Next.js 结合后，适合同时做管理页面和内容页面</li>
+<li>TypeScript 配合体验成熟</li>
+</ul>
+<h3 id="我的建议选-react但不是裸-react">3. 我的建议：选 React，但不是裸
+React</h3>
+<p>推荐路线不是：</p>
+<pre class="text"><code>React + 自己拼路由 + 自己拼构建 + 自己拼 SSR</code></pre>
+<p>而是：</p>
+<pre class="text"><code>Next.js + React + TypeScript</code></pre>
+<p>原因很简单：你需要的是一套更完整的工程框架，而不是只要一个前端库。</p>
+<h3 id="vue-路线什么时候也值得选">4. Vue 路线什么时候也值得选</h3>
+<p>如果你满足下面任意一种情况，可以考虑 Vue：</p>
+<ul>
+<li>你自己已经比较熟 Vue</li>
+<li>你更看重短期开发速度</li>
+<li>你做的是偏内容站，而不是偏系统平台</li>
+<li>你后面合作团队以 Vue 为主</li>
+</ul>
+<p>但从你现在这个项目的走向看，我仍然更建议：</p>
+<p><strong>Next.js + React + TypeScript</strong></p>
+<hr />
+<h2 id="四推荐技术栈分别是做什么的">四、推荐技术栈分别是做什么的</h2>
+<p>这一节不只告诉你名字，还告诉你“它到底解决什么问题”。</p>
+<h3 id="next.js">1. Next.js</h3>
+<h4 id="它是什么">它是什么</h4>
+<p>Next.js 是 React 的全栈框架，负责：</p>
+<ul>
+<li>页面路由</li>
+<li>服务端渲染 / 静态生成</li>
+<li>项目构建</li>
+<li>前端工程组织</li>
+<li>API 路由（如果需要）</li>
+<li>部署适配</li>
+</ul>
+<h4 id="在你项目中的作用">在你项目中的作用</h4>
+<p>它会成为你未来新的前端工程骨架，把现在这些独立 HTML 页面变成：</p>
+<ul>
+<li>群体总览页</li>
+<li>个人画像页</li>
+<li>高校对标总览页</li>
+<li>多校比较页</li>
+<li>单校详情页</li>
+<li>资源页</li>
+<li>方法页</li>
+</ul>
+<p>全部统一纳入同一个可维护的前端项目中。</p>
+<h4 id="你怎么用它">你怎么用它</h4>
+<p>你会主要用到：</p>
+<ul>
+<li><code>app/</code> 目录做页面路由</li>
+<li><code>layout.tsx</code> 做公共布局</li>
+<li><code>page.tsx</code> 做具体页面</li>
+<li>组件目录 <code>components/</code></li>
+<li>数据请求层 <code>services/</code> 或 <code>lib/</code></li>
+<li>类型定义 <code>types/</code></li>
+</ul>
+<h4 id="学它的目标">学它的目标</h4>
+<p>不是学全部，而是学会：</p>
+<ul>
+<li>页面怎么拆</li>
+<li>路由怎么建</li>
+<li>公共布局怎么做</li>
+<li>页面怎么调用后端接口</li>
+<li>组件怎么复用</li>
+</ul>
+<hr />
+<h3 id="react">2. React</h3>
+<h4 id="它是什么-1">它是什么</h4>
+<p>React 是一个组件化 UI 库，用来把页面拆成可复用单元。</p>
+<h4 id="在你项目中的作用-1">在你项目中的作用</h4>
+<p>它会把你现在分散在 HTML 中的大块结构，拆成：</p>
+<ul>
+<li>顶部导航组件</li>
+<li>KPI 卡片组件</li>
+<li>图表容器组件</li>
+<li>风险标签组件</li>
+<li>学生列表组件</li>
+<li>对标项目卡片组件</li>
+<li>比较表组件</li>
+<li>AI 对话面板组件</li>
+</ul>
+<h4 id="你怎么用它-1">你怎么用它</h4>
+<p>你会主要接触：</p>
+<ul>
+<li><code>props</code></li>
+<li><code>state</code></li>
+<li><code>useEffect</code></li>
+<li>表单状态</li>
+<li>条件渲染</li>
+<li>列表渲染</li>
+<li>组件拆分</li>
+</ul>
+<h4 id="学它的目标-1">学它的目标</h4>
+<p>学会“页面不是一整块 HTML，而是多个小组件拼出来的”这个思维。</p>
+<hr />
+<h3 id="typescript">3. TypeScript</h3>
+<h4 id="它是什么-2">它是什么</h4>
+<p>TypeScript 是 JavaScript 的类型增强版。</p>
+<h4 id="在你项目中的作用-2">在你项目中的作用</h4>
+<p>它会约束你的接口返回、组件
+props、表格字段、图表数据结构，减少后期维护时的混乱。</p>
+<p>举例说，现在后端返回的学生对象包含：</p>
+<ul>
+<li><code>student_id</code></li>
+<li><code>name</code></li>
+<li><code>warning_level</code></li>
+<li><code>student_type</code></li>
+</ul>
+<p>以后在前端你会给它定义类型，而不是靠“猜字段名”。</p>
+<h4 id="为什么它重要">为什么它重要</h4>
+<p>当项目变大后，类型就是稳定性的基础。企业项目里，接口一多，TypeScript
+的价值会非常明显。</p>
+<hr />
+<h3 id="fastapi">4. FastAPI</h3>
+<h4 id="它是什么-3">它是什么</h4>
+<p>FastAPI 是 Python Web 框架。</p>
+<h4 id="在你项目中的作用-3">在你项目中的作用</h4>
+<p>它是你现有后端逻辑的承载者。后面不建议换掉，因为你现在的优势就在于：</p>
+<ul>
+<li>学生画像逻辑已经在 Python 里</li>
+<li>数据处理已经在 Python 里</li>
+<li>AI 调用也已经在 Python 里</li>
+</ul>
+<h4 id="你后面怎么用它">你后面怎么用它</h4>
+<p>要做的不是“学会 FastAPI
+基础语法”这么简单，而是把你现在的后端从“单文件脚本”升级成“模块化服务”：</p>
+<ul>
+<li><code>api/</code> 存接口</li>
+<li><code>models/</code> 存数据库模型</li>
+<li><code>schemas/</code> 存请求和响应结构</li>
+<li><code>services/</code> 存业务逻辑</li>
+<li><code>core/</code> 存配置、数据库连接、权限等基础能力</li>
+</ul>
+<hr />
+<h3 id="postgresql">5. PostgreSQL</h3>
+<h4 id="它是什么-4">它是什么</h4>
+<p>正式关系型数据库。</p>
+<h4 id="在你项目中的作用-4">在你项目中的作用</h4>
+<p>它将替代：</p>
+<ul>
+<li><code>formal_student_data.csv</code></li>
+<li><code>assets/js/benchmark_data.js</code></li>
+</ul>
+<p>成为正式数据存储层。</p>
+<h4 id="为什么一定要上数据库">为什么一定要上数据库</h4>
+<p>因为 CSV 和 JS 文件适合 demo，但不适合企业系统：</p>
+<ul>
+<li>不方便多人维护</li>
+<li>不方便查询和筛选</li>
+<li>不方便增删改查</li>
+<li>不方便做权限和日志</li>
+<li>不方便做审核状态</li>
+</ul>
+<h4 id="未来适合放进数据库的数据">未来适合放进数据库的数据</h4>
+<ul>
+<li>学生基本信息</li>
+<li>学生维度得分</li>
+<li>风险标签</li>
+<li>建议路径</li>
+<li>高校对标项目数据</li>
+<li>校内资源导航数据</li>
+<li>操作日志</li>
+<li>用户与角色信息</li>
+</ul>
+<hr />
+<h3 id="sqlalchemy">6. SQLAlchemy</h3>
+<h4 id="它是什么-5">它是什么</h4>
+<p>Python ORM，用于把数据库表映射成 Python 对象。</p>
+<h4 id="在你项目中的作用-5">在你项目中的作用</h4>
+<p>未来你不再直接手写所有 SQL，而是通过模型类去组织数据结构。</p>
+<p>例如：</p>
+<ul>
+<li><code>Student</code></li>
+<li><code>StudentDimension</code></li>
+<li><code>BenchmarkProject</code></li>
+<li><code>ResourceItem</code></li>
+</ul>
+<h4 id="学它的目标-2">学它的目标</h4>
+<p>学会下面这些能力就够用：</p>
+<ul>
+<li>建表模型</li>
+<li>基础查询</li>
+<li>条件筛选</li>
+<li>分页</li>
+<li>关联查询</li>
+<li>插入和更新</li>
+</ul>
+<hr />
+<h3 id="alembic">7. Alembic</h3>
+<h4 id="它是什么-6">它是什么</h4>
+<p>数据库迁移工具。</p>
+<h4 id="在你项目中的作用-6">在你项目中的作用</h4>
+<p>当数据库表结构变化时，你不能靠手改数据库；而应该通过迁移脚本来管理版本变化。</p>
+<p>这在企业项目里非常关键，因为数据库结构不是一次性定死的。</p>
+<h4 id="你怎么用它-2">你怎么用它</h4>
+<p>典型流程是：</p>
+<pre class="text"><code>修改 SQLAlchemy 模型
+  -&gt; 生成迁移脚本
+  -&gt; 执行迁移
+  -&gt; 数据库结构同步更新</code></pre>
+<hr />
+<h3 id="auth.js-登录鉴权方案">8. Auth.js / 登录鉴权方案</h3>
+<h4 id="它是什么-7">它是什么</h4>
+<p>登录与会话管理方案。</p>
+<h4 id="在你项目中的作用-7">在你项目中的作用</h4>
+<p>未来这个系统一旦用于更正式场景，就不可能所有人都直接看全部内容，至少要区分：</p>
+<ul>
+<li>管理员</li>
+<li>导师 / 老师</li>
+<li>普通查看者</li>
+</ul>
+<h4 id="你要学什么">你要学什么</h4>
+<ul>
+<li>登录是什么</li>
+<li>token / session 是什么</li>
+<li>路由保护是什么</li>
+<li>权限控制是什么</li>
+</ul>
+<p>你前期不一定非得马上上完整 SSO，但要先把权限模型想清楚。</p>
+<hr />
+<h3 id="playwright">9. Playwright</h3>
+<h4 id="它是什么-8">它是什么</h4>
+<p>前端端到端测试工具。</p>
+<h4 id="在你项目中的作用-8">在你项目中的作用</h4>
+<p>它能自动帮你验证这些事：</p>
+<ul>
+<li>页面能不能打开</li>
+<li>登录能不能走通</li>
+<li>学生列表能不能点开详情</li>
+<li>对标比较页能不能正常显示图表</li>
+</ul>
+<h4 id="为什么它重要-1">为什么它重要</h4>
+<p>你的项目一旦从原型升级到正式工程，测试是必须补上的，不然每次改页面都容易破坏原有功能。</p>
+<hr />
+<h3 id="github-actions">10. GitHub Actions</h3>
+<h4 id="它是什么-9">它是什么</h4>
+<p>自动化工作流。</p>
+<h4 id="在你项目中的作用-9">在你项目中的作用</h4>
+<p>可以让项目在 push 代码后自动执行：</p>
+<ul>
+<li>前端 lint</li>
+<li>前端测试</li>
+<li>后端测试</li>
+<li>构建</li>
+<li>部署</li>
+</ul>
+<h4 id="企业化意义">企业化意义</h4>
+<p>它让项目不是靠“手动检查”，而是逐步拥有自动质量保障。</p>
+<hr />
+<h3 id="docker">11. Docker</h3>
+<h4 id="它是什么-10">它是什么</h4>
+<p>容器化工具。</p>
+<h4 id="在你项目中的作用-10">在你项目中的作用</h4>
+<p>它能把你的前端、后端、数据库环境标准化，解决“我电脑能跑，你电脑不能跑”的问题。</p>
+<h4 id="为什么后期重要">为什么后期重要</h4>
+<p>项目越正式，环境一致性越重要。Docker
+不一定第一周学，但后期一定要补。</p>
+<hr />
+<h3 id="sentry">12. Sentry</h3>
+<h4 id="它是什么-11">它是什么</h4>
+<p>错误监控平台。</p>
+<h4 id="在你项目中的作用-11">在你项目中的作用</h4>
+<p>如果线上页面报错、接口异常、用户看到白屏，你需要一个地方集中看这些错误，而不是用户来告诉你。</p>
+<hr />
+<h2 id="五企业化升级的底层逻辑图">五、企业化升级的底层逻辑图</h2>
+<h3 id="不只是换框架而是升级四个层次">1.
+不只是“换框架”，而是升级四个层次</h3>
+<pre class="text"><code>第一层：页面层升级
+原生 HTML -&gt; 组件化前端
+
+第二层：数据层升级
+CSV / JS -&gt; PostgreSQL
+
+第三层：系统层升级
+单脚本原型 -&gt; 模块化前后端工程
+
+第四层：治理层升级
+手工维护 -&gt; 权限、日志、测试、监控、自动部署</code></pre>
+<h3 id="你的项目升级思路图">2. 你的项目升级思路图</h3>
+<pre class="text"><code>当前项目已有：
+业务逻辑完整
+  ├─ 群体画像
+  ├─ 个人画像
+  ├─ 高校对标
+  ├─ 资源承接
+  ├─ 方法说明
+  └─ AI 助手
+
+升级时不要丢掉业务逻辑
+  -&gt; 保留页面含义
+  -&gt; 保留后端业务处理
+  -&gt; 保留数据口径
+  -&gt; 升级前端框架
+  -&gt; 升级数据存储
+  -&gt; 增加企业能力</code></pre>
+<h3 id="你以后要具备的完整工程图">3. 你以后要具备的完整工程图</h3>
+<pre class="text"><code>用户
+  -&gt; 前端 Next.js
+      -&gt; 页面组件
+      -&gt; 图表组件
+      -&gt; 权限路由
+      -&gt; 管理后台
+  -&gt; 调用 FastAPI
+      -&gt; 画像接口
+      -&gt; 对标接口
+      -&gt; AI 接口
+      -&gt; 权限接口
+  -&gt; 访问 PostgreSQL
+      -&gt; 学生数据
+      -&gt; 对标数据
+      -&gt; 资源数据
+      -&gt; 用户与日志
+  -&gt; GitHub Actions 自动测试与部署
+  -&gt; Sentry 负责错误监控</code></pre>
+<hr />
+<h2 id="六八周总体安排总览">六、八周总体安排总览</h2>
+<p>先看全局，再看每周细节。</p>
+<h3 id="八周总目标图">八周总目标图</h3>
+<pre class="text"><code>第1-2周：技术选型和前端重构起步
+第3-4周：后端模块化和数据库落地
+第5-6周：核心页面迁移与数据正式化
+第7周：权限、测试、监控
+第8周：上线收尾、文档、复盘、下一阶段规划</code></pre>
+<h3 id="八周完成后的目标状态">八周完成后的目标状态</h3>
+<p>8 周结束时，理想成果不是“所有功能全部完美”，而是：</p>
+<ul>
+<li>新前端项目已经搭起来</li>
+<li>核心页面至少迁移了 2 到 4 个</li>
+<li>后端不再是单文件原型结构</li>
+<li>数据库已经能承载核心数据</li>
+<li>学生数据和对标数据开始接口化</li>
+<li>具备基础登录 / 权限骨架</li>
+<li>有最基础的测试和监控</li>
+<li>有可继续长期开发的项目结构</li>
+</ul>
+<hr />
+<h2 id="七八周详细计划">七、八周详细计划</h2>
+<p>下面是最核心的部分。</p>
+<hr />
+<h2 id="第-1-周定路线搭脚手架补核心基础">第 1
+周：定路线、搭脚手架、补核心基础</h2>
+<h3 id="本周目标">本周目标</h3>
+<ul>
+<li>明确最终技术路线</li>
+<li>初始化新的前端工程</li>
+<li>开始系统学习 React / Next.js / TypeScript 基础</li>
+<li>梳理旧项目页面地图和接口地图</li>
+</ul>
+<h3 id="为什么先做这个">为什么先做这个</h3>
+<p>因为企业化升级最怕“边学边乱改”。第一周必须先把路线定住，不然第 3
+周很可能又推翻重来。</p>
+<h3 id="本周学习内容">本周学习内容</h3>
+<h4 id="react-基础">1. React 基础</h4>
+<p>要学：</p>
+<ul>
+<li>组件是什么</li>
+<li><code>props</code></li>
+<li><code>state</code></li>
+<li><code>useEffect</code></li>
+<li>事件处理</li>
+<li>条件渲染</li>
+<li>列表渲染</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>把现在的 KPI 卡、导航、学生卡片都看成组件</li>
+</ul>
+<h4 id="next.js-基础">2. Next.js 基础</h4>
+<p>要学：</p>
+<ul>
+<li><code>app</code> 路由模式</li>
+<li>页面文件结构</li>
+<li>布局文件</li>
+<li>客户端组件和服务端组件的概念</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>把 <code>index_formal.html</code> 理解成未来一个
+<code>page.tsx</code></li>
+<li>把公共导航理解成 <code>layout.tsx</code> 或公共组件</li>
+</ul>
+<h4 id="typescript-基础">3. TypeScript 基础</h4>
+<p>要学：</p>
+<ul>
+<li>基础类型</li>
+<li>接口 <code>interface</code></li>
+<li>类型别名 <code>type</code></li>
+<li>函数参数类型</li>
+<li>API 返回类型</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>给学生对象、风险对象、对标项目对象定义类型</li>
+</ul>
+<h3 id="本周要做的项目任务">本周要做的项目任务</h3>
+<ul>
+<li>新建 <code>frontend/</code> 项目</li>
+<li>使用 Next.js + TypeScript 初始化</li>
+<li>建立基础目录：
+<ul>
+<li><code>app/</code></li>
+<li><code>components/</code></li>
+<li><code>types/</code></li>
+<li><code>services/</code></li>
+<li><code>styles/</code></li>
+</ul></li>
+<li>把当前所有页面做一张“页面地图”</li>
+<li>把现有 FastAPI 接口做一张“接口地图”</li>
+<li>写一份迁移清单，列出哪些页面优先迁移</li>
+</ul>
+<h3 id="本周交付物">本周交付物</h3>
+<ul>
+<li>新前端项目能跑起来</li>
+<li>一个简单首页能打开</li>
+<li>页面与接口清单文档</li>
+<li>核心类型定义初稿</li>
+</ul>
+<h3 id="本周验收标准">本周验收标准</h3>
+<ul>
+<li>能在本地打开新的 Next.js 页面</li>
+<li>你能清楚说出：页面、组件、接口、数据四者分别是什么</li>
+</ul>
+<hr />
+<h2 id="第-2-周组件化前端基础与设计系统初版">第 2
+周：组件化前端基础与设计系统初版</h2>
+<h3 id="本周目标-1">本周目标</h3>
+<ul>
+<li>建立公共布局和组件系统</li>
+<li>统一视觉规范</li>
+<li>学会前端如何请求后端数据</li>
+</ul>
+<h3 id="本周学习内容-1">本周学习内容</h3>
+<h4 id="组件设计思维">1. 组件设计思维</h4>
+<p>要学：</p>
+<ul>
+<li>页面拆分原则</li>
+<li>容器组件和展示组件</li>
+<li>组件复用</li>
+<li>组件命名规范</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>以后不是每个页面都重新写按钮、卡片、标签、表格</li>
+</ul>
+<h4 id="数据请求">2. 数据请求</h4>
+<p>要学：</p>
+<ul>
+<li>前端如何调用后端 API</li>
+<li>请求层和页面层分离</li>
+<li>loading / error / empty 状态处理</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>调用现在 FastAPI 的 <code>/api/formal/overview</code></li>
+<li>先让新前端拿到旧后端的数据</li>
+</ul>
+<h3 id="本周要做的项目任务-1">本周要做的项目任务</h3>
+<ul>
+<li>搭好全站 Layout</li>
+<li>抽离基础组件：
+<ul>
+<li><code>PageShell</code></li>
+<li><code>SectionCard</code></li>
+<li><code>KpiCard</code></li>
+<li><code>Tag</code></li>
+<li><code>EmptyState</code></li>
+<li><code>LoadingBlock</code></li>
+<li><code>ErrorBlock</code></li>
+</ul></li>
+<li>建立主题变量：
+<ul>
+<li>颜色</li>
+<li>间距</li>
+<li>标题层级</li>
+<li>阴影</li>
+<li>圆角</li>
+</ul></li>
+<li>新建 <code>services/api.ts</code> 统一封装接口</li>
+<li>把群体页顶部框架迁移到新前端里</li>
+</ul>
+<h3 id="本周交付物-1">本周交付物</h3>
+<ul>
+<li>可复用组件基础库</li>
+<li>基础布局系统</li>
+<li>前端接口请求层</li>
+<li>群体页壳子版本</li>
+</ul>
+<h3 id="本周验收标准-1">本周验收标准</h3>
+<ul>
+<li>群体页新前端可以调通至少一个接口</li>
+<li>公共组件不再散落到每个页面里</li>
+</ul>
+<hr />
+<h2 id="第-3-周后端模块化改造">第 3 周：后端模块化改造</h2>
+<h3 id="本周目标-2">本周目标</h3>
+<ul>
+<li>把后端从单文件原型逐步整理成模块化项目</li>
+<li>学习 FastAPI 的工程化组织方式</li>
+</ul>
+<h3 id="本周学习内容-2">本周学习内容</h3>
+<h4 id="fastapi-工程化结构">1. FastAPI 工程化结构</h4>
+<p>要学：</p>
+<ul>
+<li>路由拆分</li>
+<li>Schema 拆分</li>
+<li>Service 层</li>
+<li>配置管理</li>
+<li>中间件</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>把现在 <code>backend_formal.py</code> 里混在一起的逻辑拆开</li>
+</ul>
+<h4 id="pydantic-schema-设计">2. Pydantic / Schema 设计</h4>
+<p>要学：</p>
+<ul>
+<li>请求和响应模型</li>
+<li>字段校验</li>
+<li>返回结构统一</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>给学生列表、学生详情、群体概览建立结构化响应模型</li>
+</ul>
+<h3 id="本周要做的项目任务-2">本周要做的项目任务</h3>
+<ul>
+<li>新建 <code>backend/app/</code></li>
+<li>拆分模块：
+<ul>
+<li><code>api/routes/</code></li>
+<li><code>schemas/</code></li>
+<li><code>services/</code></li>
+<li><code>core/</code></li>
+</ul></li>
+<li>把以下接口先迁过去：
+<ul>
+<li><code>overview</code></li>
+<li><code>students</code></li>
+<li><code>student/{id}</code></li>
+<li><code>warnings</code></li>
+</ul></li>
+<li>统一响应格式</li>
+<li>把配置项从代码中剥离出来</li>
+</ul>
+<h3 id="本周交付物-2">本周交付物</h3>
+<ul>
+<li>模块化后的后端骨架</li>
+<li>至少 4 个核心接口可正常使用</li>
+<li>统一配置方案</li>
+</ul>
+<h3 id="本周验收标准-2">本周验收标准</h3>
+<ul>
+<li>后端仍然能跑</li>
+<li>核心接口地址不乱</li>
+<li>代码目录比现在清晰很多</li>
+</ul>
+<hr />
+<h2 id="第-4-周数据库设计与数据入库">第 4 周：数据库设计与数据入库</h2>
+<h3 id="本周目标-3">本周目标</h3>
+<ul>
+<li>正式引入 PostgreSQL</li>
+<li>学习 SQLAlchemy 和 Alembic</li>
+<li>把 CSV / JS 数据逐步导入数据库</li>
+</ul>
+<h3 id="本周学习内容-3">本周学习内容</h3>
+<h4 id="postgresql-基础">1. PostgreSQL 基础</h4>
+<p>要学：</p>
+<ul>
+<li>表、字段、主键、索引</li>
+<li>一对多关系</li>
+<li>基础查询</li>
+</ul>
+<p>你怎么用：</p>
+<ul>
+<li>设计学生表、维度表、对标项目表</li>
+</ul>
+<h4 id="sqlalchemy-1">2. SQLAlchemy</h4>
+<p>要学：</p>
+<ul>
+<li>模型定义</li>
+<li>Session</li>
+<li>查询</li>
+<li>插入更新</li>
+</ul>
+<h4 id="alembic-1">3. Alembic</h4>
+<p>要学：</p>
+<ul>
+<li>初始化迁移</li>
+<li>生成迁移脚本</li>
+<li>执行迁移</li>
+</ul>
+<h3 id="本周要做的项目任务-3">本周要做的项目任务</h3>
+<ul>
+<li>启动 PostgreSQL</li>
+<li>定义核心表：
+<ul>
+<li><code>students</code></li>
+<li><code>student_dimensions</code></li>
+<li><code>student_risks</code></li>
+<li><code>student_advice</code></li>
+<li><code>benchmark_projects</code></li>
+<li><code>resource_items</code></li>
+</ul></li>
+<li>建入库脚本：
+<ul>
+<li>从 <code>formal_student_data.csv</code> 导入</li>
+<li>从 <code>benchmark_data.js</code> 转成可导入数据</li>
+</ul></li>
+<li>为后端写数据库访问层</li>
+</ul>
+<h3 id="本周交付物-3">本周交付物</h3>
+<ul>
+<li>数据库初版</li>
+<li>数据表结构图</li>
+<li>导入脚本</li>
+<li>Alembic 迁移记录</li>
+</ul>
+<h3 id="本周验收标准-3">本周验收标准</h3>
+<ul>
+<li>至少能从数据库查出学生列表和对标项目列表</li>
+<li>新后端已经不再只能依赖 CSV</li>
+</ul>
+<hr />
+<h2 id="第-5-周迁移群体页与学生页">第 5 周：迁移群体页与学生页</h2>
+<h3 id="本周目标-4">本周目标</h3>
+<ul>
+<li>把最核心的两个页面迁移到新前端</li>
+<li>用正式接口和数据库支持页面</li>
+</ul>
+<h3 id="本周学习内容-4">本周学习内容</h3>
+<h4 id="图表组件封装">1. 图表组件封装</h4>
+<p>要学：</p>
+<ul>
+<li>ECharts 在 React 中怎么封装</li>
+<li>图表数据和页面逻辑怎么分开</li>
+</ul>
+<h4 id="页面状态管理">2. 页面状态管理</h4>
+<p>要学：</p>
+<ul>
+<li>筛选条件管理</li>
+<li>图表点击联动</li>
+<li>弹窗状态管理</li>
+</ul>
+<h3 id="本周要做的项目任务-4">本周要做的项目任务</h3>
+<ul>
+<li>迁移群体页：
+<ul>
+<li>KPI 区</li>
+<li>维度图</li>
+<li>类型分布</li>
+<li>预警分布</li>
+<li>学生列表</li>
+</ul></li>
+<li>迁移学生页：
+<ul>
+<li>基本档案</li>
+<li>雷达图</li>
+<li>风险标签</li>
+<li>建议路径</li>
+</ul></li>
+<li>把老页面中重复逻辑组件化</li>
+</ul>
+<h3 id="本周交付物-4">本周交付物</h3>
+<ul>
+<li>新版群体页</li>
+<li>新版学生页</li>
+<li>ECharts 组件封装</li>
+</ul>
+<h3 id="本周验收标准-4">本周验收标准</h3>
+<ul>
+<li>用户可以在新前端中完成“看群体 -&gt; 点学生 -&gt;
+看个人画像”的主链路</li>
+</ul>
+<hr />
+<h2 id="第-6-周迁移对标模块与资源模块">第 6
+周：迁移对标模块与资源模块</h2>
+<h3 id="本周目标-5">本周目标</h3>
+<ul>
+<li>完成对标模块迁移</li>
+<li>让对标数据从正式接口读取</li>
+<li>开始准备后台维护化</li>
+</ul>
+<h3 id="本周学习内容-5">本周学习内容</h3>
+<h4 id="表格与筛选">1. 表格与筛选</h4>
+<p>要学：</p>
+<ul>
+<li>列表页筛选</li>
+<li>表格渲染</li>
+<li>排序</li>
+<li>分页思维</li>
+</ul>
+<h4 id="详情页与比较页组织">2. 详情页与比较页组织</h4>
+<p>要学：</p>
+<ul>
+<li>URL 参数驱动页面</li>
+<li>详情页和比较页的数据组织方式</li>
+</ul>
+<h3 id="本周要做的项目任务-5">本周要做的项目任务</h3>
+<ul>
+<li>迁移：
+<ul>
+<li>对标总览页</li>
+<li>对标详情页</li>
+<li>多校比较页</li>
+<li>资源导航页</li>
+</ul></li>
+<li>把 <code>benchmark_data.js</code> 对标数据改成后端接口读取</li>
+<li>后端补充对标项目 CRUD 基础能力</li>
+</ul>
+<h3 id="本周交付物-5">本周交付物</h3>
+<ul>
+<li>新版对标模块</li>
+<li>对标接口</li>
+<li>资源页迁移版</li>
+</ul>
+<h3 id="本周验收标准-5">本周验收标准</h3>
+<ul>
+<li>用户可以在新前端完成“看总览 -&gt; 看详情 -&gt;
+做比较”的完整链路</li>
+</ul>
+<hr />
+<h2 id="第-7-周权限测试监控与质量保障">第 7
+周：权限、测试、监控与质量保障</h2>
+<h3 id="本周目标-6">本周目标</h3>
+<ul>
+<li>补企业级系统最关键的基础治理能力</li>
+</ul>
+<h3 id="本周学习内容-6">本周学习内容</h3>
+<h4 id="登录与权限">1. 登录与权限</h4>
+<p>要学：</p>
+<ul>
+<li>用户、角色、权限的概念</li>
+<li>路由保护</li>
+<li>登录态</li>
+</ul>
+<h4 id="测试">2. 测试</h4>
+<p>要学：</p>
+<ul>
+<li>后端接口测试</li>
+<li>前端端到端测试</li>
+</ul>
+<h4 id="监控">3. 监控</h4>
+<p>要学：</p>
+<ul>
+<li>页面错误监控</li>
+<li>接口异常监控</li>
+</ul>
+<h3 id="本周要做的项目任务-6">本周要做的项目任务</h3>
+<ul>
+<li>添加基础登录页</li>
+<li>区分至少两种角色：
+<ul>
+<li>管理员</li>
+<li>查看者</li>
+</ul></li>
+<li>用 Playwright 写 3 到 5 条核心用例：
+<ul>
+<li>打开首页</li>
+<li>查看学生详情</li>
+<li>多校比较</li>
+<li>登录退出</li>
+</ul></li>
+<li>接入 Sentry</li>
+<li>GitHub Actions 增加自动测试</li>
+</ul>
+<h3 id="本周交付物-6">本周交付物</h3>
+<ul>
+<li>登录骨架</li>
+<li>基础权限控制</li>
+<li>自动化测试初版</li>
+<li>错误监控初版</li>
+</ul>
+<h3 id="本周验收标准-6">本周验收标准</h3>
+<ul>
+<li>至少关键页面有基础权限保护</li>
+<li>测试能自动跑</li>
+<li>线上异常能被记录</li>
+</ul>
+<hr />
+<h2 id="第-8-周收尾上线文档沉淀下一阶段规划">第 8
+周：收尾上线、文档沉淀、下一阶段规划</h2>
+<h3 id="本周目标-7">本周目标</h3>
+<ul>
+<li>把整个升级结果整理为一个“可继续迭代”的正式工程</li>
+</ul>
+<h3 id="本周学习内容-7">本周学习内容</h3>
+<h4 id="docker-基础">1. Docker 基础</h4>
+<p>要学：</p>
+<ul>
+<li>Dockerfile</li>
+<li>多服务运行思路</li>
+</ul>
+<h4 id="部署与环境管理">2. 部署与环境管理</h4>
+<p>要学：</p>
+<ul>
+<li>开发环境</li>
+<li>测试环境</li>
+<li>生产环境</li>
+<li>环境变量管理</li>
+</ul>
+<h3 id="本周要做的项目任务-7">本周要做的项目任务</h3>
+<ul>
+<li>给前后端写 Docker 配置</li>
+<li>梳理部署文档</li>
+<li>输出项目 README 和开发文档</li>
+<li>梳理目录结构</li>
+<li>写下一阶段迭代路线：
+<ul>
+<li>后台内容维护</li>
+<li>数据审核</li>
+<li>导出报告</li>
+<li>更细粒度权限</li>
+</ul></li>
+</ul>
+<h3 id="本周交付物-7">本周交付物</h3>
+<ul>
+<li>可部署工程</li>
+<li>完整说明文档</li>
+<li>目录结构稳定版</li>
+<li>二阶段路线图</li>
+</ul>
+<h3 id="本周验收标准-7">本周验收标准</h3>
+<ul>
+<li>新系统具备长期开发基础</li>
+<li>别人接手时不会一脸茫然</li>
+</ul>
+<hr />
+<h2 id="八学习顺序建议">八、学习顺序建议</h2>
+<p>很多人容易犯的错误是同时学太多工具。更合理的顺序是：</p>
+<pre class="text"><code>先学前端框架基础
+  -&gt; 再学组件与类型
+  -&gt; 再学后端工程化
+  -&gt; 再学数据库
+  -&gt; 再学鉴权与测试
+  -&gt; 最后补 Docker / 监控 / 自动化</code></pre>
+<h3 id="推荐优先级">推荐优先级</h3>
+<h4 id="第一优先级">第一优先级</h4>
+<ul>
+<li>React</li>
+<li>Next.js</li>
+<li>TypeScript</li>
+<li>FastAPI 工程化</li>
+</ul>
+<h4 id="第二优先级">第二优先级</h4>
+<ul>
+<li>PostgreSQL</li>
+<li>SQLAlchemy</li>
+<li>Alembic</li>
+</ul>
+<h4 id="第三优先级">第三优先级</h4>
+<ul>
+<li>Auth.js / 登录权限</li>
+<li>Playwright</li>
+<li>GitHub Actions</li>
+</ul>
+<h4 id="第四优先级">第四优先级</h4>
+<ul>
+<li>Docker</li>
+<li>Sentry</li>
+<li>性能优化</li>
+</ul>
+<hr />
+<h2
+id="九你后面最需要形成的能力不是背-api而是这几种思维">九、你后面最需要形成的能力，不是背
+API，而是这几种思维</h2>
+<h3 id="组件思维">1. 组件思维</h3>
+<p>页面不是一整块，而是一组可复用单元。</p>
+<h3 id="数据思维">2. 数据思维</h3>
+<p>显示出来的页面背后应该有明确的数据结构和数据来源。</p>
+<h3 id="分层思维">3. 分层思维</h3>
+<p>前端、后端、数据库、部署、监控，不要混在一起。</p>
+<h3 id="可维护思维">4. 可维护思维</h3>
+<p>不是“能跑就行”，而是“过三个月还能改”。</p>
+<h3 id="系统思维">5. 系统思维</h3>
+<p>企业系统不是页面集合，而是：</p>
+<ul>
+<li>权限</li>
+<li>数据</li>
+<li>流程</li>
+<li>审计</li>
+<li>稳定性</li>
+</ul>
+<p>共同构成的整体。</p>
+<hr />
+<h2 id="十最容易踩的坑">十、最容易踩的坑</h2>
+<h3 id="坑-1一上来就全量重写">坑 1：一上来就全量重写</h3>
+<p>后果：</p>
+<ul>
+<li>业务逻辑丢失</li>
+<li>页面细节丢失</li>
+<li>做了很久反而不如现在能用</li>
+</ul>
+<h3 id="坑-2只换前端不动数据">坑 2：只换前端，不动数据</h3>
+<p>后果：</p>
+<ul>
+<li>看起来更现代</li>
+<li>本质还是 demo</li>
+</ul>
+<h3 id="坑-3同时学太多技术">坑 3：同时学太多技术</h3>
+<p>后果：</p>
+<ul>
+<li>每个都懂一点</li>
+<li>没一个真正落地</li>
+</ul>
+<h3 id="坑-4太早追求复杂架构">坑 4：太早追求复杂架构</h3>
+<p>比如一开始就搞：</p>
+<ul>
+<li>微服务</li>
+<li>多前端仓库</li>
+<li>一堆中间件</li>
+</ul>
+<p>对你现在阶段没有必要。</p>
+<h3 id="坑-5忽略文档和测试">坑 5：忽略文档和测试</h3>
+<p>企业化不是代码多，而是项目更稳。</p>
+<hr />
+<h2 id="十一八周之外的中长期规划">十一、八周之外的中长期规划</h2>
+<p>如果 8 周升级做完，下一阶段可以继续做这些：</p>
+<h3 id="后台内容维护系统">1. 后台内容维护系统</h3>
+<p>让管理员能维护：</p>
+<ul>
+<li>对标项目</li>
+<li>资源导航</li>
+<li>政策说明</li>
+</ul>
+<h3 id="数据审核机制">2. 数据审核机制</h3>
+<p>给每条数据增加：</p>
+<ul>
+<li>来源</li>
+<li>更新时间</li>
+<li>审核状态</li>
+<li>审核人</li>
+</ul>
+<h3 id="报告导出">3. 报告导出</h3>
+<p>支持：</p>
+<ul>
+<li>个人画像报告导出</li>
+<li>群体统计报告导出</li>
+<li>对标对比报告导出</li>
+</ul>
+<h3 id="更正式的权限系统">4. 更正式的权限系统</h3>
+<ul>
+<li>管理员</li>
+<li>导师</li>
+<li>院系管理者</li>
+<li>只读访客</li>
+</ul>
+<h3 id="更稳定的生产部署">5. 更稳定的生产部署</h3>
+<ul>
+<li>专属域名</li>
+<li>HTTPS</li>
+<li>数据备份</li>
+<li>多环境发布</li>
+</ul>
+<hr />
+<h2 id="十二给你的最终建议">十二、给你的最终建议</h2>
+<p>如果你只记住一句话，那就是：</p>
+<p><strong>你后面要做的不是“从 HTML 换到
+React”，而是把“高质量原型”升级成“可维护的正式系统”。</strong></p>
+<p>所以真正的升级顺序应该是：</p>
+<pre class="text"><code>保留业务逻辑
+  -&gt; 升级前端工程
+  -&gt; 升级后端结构
+  -&gt; 升级数据层
+  -&gt; 补权限、测试、监控、部署</code></pre>
+<p>而不是：</p>
+<pre class="text"><code>因为 React 热门，所以全部推倒重写</code></pre>
+<p>这是两个完全不同的思路。</p>
+<p>前者大概率能成功，后者大概率会让项目中途失控。</p>
+<hr />
+<h2 id="十三推荐官方学习资料">十三、推荐官方学习资料</h2>
+<p>下面这些官方资料，建议你在 8 周中按需查阅。</p>
+<h3 id="前端与框架">前端与框架</h3>
+<ul>
+<li><p>React 官方： https://react.dev/learn</p></li>
+<li><p>React 官方：Start a New React Project
+https://react.dev/learn/start-a-new-react-project</p></li>
+<li><p>Next.js 官方：App Router Getting Started
+https://nextjs.org/docs/app/getting-started</p></li>
+<li><p>Vue 官方： https://vuejs.org/guide/introduction.html</p></li>
+<li><p>Nuxt 官方： https://nuxt.com/docs</p></li>
+</ul>
+<h3 id="后端与数据库">后端与数据库</h3>
+<ul>
+<li><p>FastAPI 官方： https://fastapi.tiangolo.com/tutorial/</p></li>
+<li><p>SQLAlchemy 官方 ORM Quick Start：
+https://docs.sqlalchemy.org/20/orm/quickstart.html</p></li>
+<li><p>Alembic 官方：
+https://alembic.sqlalchemy.org/en/latest/tutorial.html</p></li>
+<li><p>PostgreSQL 官方文档：
+https://www.postgresql.org/docs/current/tutorial-start.html</p></li>
+</ul>
+<h3 id="工程与质量">工程与质量</h3>
+<ul>
+<li><p>Playwright 官方： https://playwright.dev/docs/intro</p></li>
+<li><p>GitHub Actions 官方：
+https://docs.github.com/actions/quickstart</p></li>
+<li><p>Docker 官方： https://docs.docker.com/get-started/</p></li>
+<li><p>Sentry Next.js 官方：
+https://docs.sentry.io/platforms/javascript/guides/nextjs/</p></li>
+</ul>
+<h3 id="鉴权">鉴权</h3>
+<ul>
+<li>Auth.js 官方： https://authjs.dev/getting-started</li>
+</ul>
+<hr />
+<h2 id="十四最后的落地建议">十四、最后的落地建议</h2>
+<p>如果你接下来立刻开始做，我建议你的第一动作不是学一堆视频，而是做下面三件事：</p>
+<ol type="1">
+<li>在项目旁边新建一个 <code>frontend/</code>，用 Next.js + TypeScript
+初始化</li>
+<li>把你现在的网站页面和接口先画成一张迁移清单</li>
+<li>先只迁移两个最核心页面：
+<ul>
+<li>群体页</li>
+<li>个人画像页</li>
+</ul></li>
+</ol>
+<p>只要这两页迁成功，整个企业化升级路线就已经真正启动了。</p>
+<hr />
+<h2 id="附录一句话版本的技术定位">附录：一句话版本的技术定位</h2>
+<h3 id="当前项目">当前项目</h3>
+<pre class="text"><code>高质量可上线原型系统</code></pre>
+<h3 id="目标项目">目标项目</h3>
+<pre class="text"><code>可持续维护的正式数据驱动平台</code></pre>
+<h3 id="核心升级路线">核心升级路线</h3>
+<pre class="text"><code>HTML 原型 -&gt; 组件化前端
+CSV/JS 数据 -&gt; PostgreSQL
+单文件脚本 -&gt; 模块化工程
+手动维护 -&gt; 自动化与治理能力</code></pre>
+</body>
+</html>
